@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPT Detector</title>
+    <title>CompText</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -37,7 +37,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -71,13 +71,32 @@
             color: var(--dark-text);
         }
 
+        .main-content {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .editor-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .grammar-section {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
         .editor-container {
             position: relative;
             border-radius: var(--border-radius);
             background-color: white;
             box-shadow: var(--box-shadow);
             transition: var(--transition);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            height: calc(100vh - 220px);
+            min-height: 300px;
         }
 
         body.dark-mode .editor-container {
@@ -86,7 +105,7 @@
 
         .editor {
             width: 100%;
-            min-height: 300px;
+            height: 100%;
             padding: 1rem;
             font-size: 1rem;
             line-height: 1.5;
@@ -97,65 +116,49 @@
             background-color: transparent;
             color: var(--light-text);
             transition: var(--transition);
+            box-sizing: border-box;
         }
 
         body.dark-mode .editor {
             color: var(--dark-text);
         }
 
-        .stats-container {
+        .word-count {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            text-align: right;
+        }
+
+        .grammar-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
         }
 
-        .stat-box {
-            flex: 1;
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            background-color: white;
-            box-shadow: var(--box-shadow);
-            margin-right: 1rem;
-            transition: var(--transition);
+        .grammar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
         }
 
-        .stat-box:last-child {
-            margin-right: 0;
-        }
-
-        body.dark-mode .stat-box {
-            background-color: #1e1e1e;
-        }
-
-        .stat-title {
-            font-size: 0.875rem;
-            color: #6c757d;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
+        .grammar-score {
+            background-color: var(--success);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-weight: 700;
-        }
-
-        .gpt-high {
-            color: var(--error);
-        }
-
-        .gpt-medium {
-            color: var(--warning);
-        }
-
-        .gpt-low {
-            color: var(--success);
-        }
-
-        .grammar-issues {
-            margin-top: 1.5rem;
         }
 
         .issue-list {
             padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
         }
 
         .issue-item {
@@ -182,6 +185,7 @@
 
         .issue-text {
             flex: 1;
+            font-size: 0.875rem;
         }
 
         .issue-suggestion {
@@ -189,6 +193,7 @@
             color: var(--primary);
             cursor: pointer;
             margin-left: 0.5rem;
+            font-size: 0.875rem;
         }
 
         .highlight-container {
@@ -204,6 +209,7 @@
             font-size: 1rem;
             line-height: 1.5;
             color: transparent;
+            box-sizing: border-box;
         }
 
         .gpt-highlight {
@@ -246,32 +252,6 @@
             display: block;
         }
 
-        .progress-circle {
-            width: 60px;
-            height: 60px;
-            position: relative;
-        }
-
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-
-        .progress-ring-circle {
-            stroke-dasharray: 283;
-            transition: stroke-dashoffset 0.35s;
-            transform-origin: 50% 50%;
-            stroke-linecap: round;
-        }
-
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1rem;
-            font-weight: 700;
-        }
-
         .loading {
             position: absolute;
             top: 0;
@@ -308,25 +288,82 @@
             to { transform: rotate(360deg); }
         }
 
-        .footer {
-            margin-top: 2rem;
-            text-align: center;
+        .gpt-detection-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .gpt-detection-section {
+            background-color: #1e1e1e;
+        }
+
+        .gpt-detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .gpt-detection-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .gpt-score-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .gpt-progress {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .gpt-progress-bar {
+            height: 100%;
+            background-color: var(--error);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .gpt-info {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.875rem;
             color: #6c757d;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .stats-container {
+        .gpt-high {
+            color: var(--error);
+        }
+
+        .gpt-medium {
+            color: var(--warning);
+        }
+
+        .gpt-low {
+            color: var(--success);
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
                 flex-direction: column;
             }
             
-            .stat-box {
-                margin-right: 0;
-                margin-bottom: 1rem;
+            .grammar-section {
+                width: 100%;
+                margin-top: 1.5rem;
+            }
+
+            .editor-container {
+                height: 350px;
             }
         }
     </style>
@@ -335,42 +372,51 @@
     <div class="container">
         <header>
             <div class="logo">
-                <i class="fas fa-robot"></i>
-                <span>GPT Detector</span>
+                <i class="fas fa-text-height"></i>
+                <span>CompText</span>
             </div>
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i>
             </button>
         </header>
 
-        <div class="editor-container">
-            <textarea id="editor" class="editor" placeholder="Type or paste your text here to analyze for AI detection and grammar issues..."></textarea>
-            <div class="highlight-container" id="highlightContainer"></div>
-            <div class="loading" id="loading" style="display: none;">
-                <div class="spinner"></div>
+        <div class="main-content">
+            <div class="editor-section">
+                <div class="editor-container">
+                    <textarea id="editor" class="editor" placeholder="Type or paste your text here to analyze for AI detection and grammar issues..."></textarea>
+                    <div class="highlight-container" id="highlightContainer"></div>
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <div class="word-count">Words: <span id="wordCount">0</span></div>
+            </div>
+
+            <div class="grammar-section">
+                <div class="grammar-header">
+                    <div class="grammar-title">Grammar</div>
+                    <div class="grammar-score" id="grammarScore">100</div>
+                </div>
+                <ul class="issue-list" id="issueList">
+                    <!-- Grammar issues will be listed here -->
+                </ul>
             </div>
         </div>
 
-        <div class="stats-container">
-            <div class="stat-box">
-                <div class="stat-title">GPT Detection</div>
-                <div class="stat-value" id="gptScore">0%</div>
+        <div class="gpt-detection-section">
+            <div class="gpt-detection-header">
+                <div class="gpt-detection-title">AI Content Detection</div>
+                <div class="gpt-score-container">
+                    <div id="gptScore" class="gpt-low">0%</div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-title">Grammar Score</div>
-                <div class="stat-value" id="grammarScore">100%</div>
+            <div class="gpt-progress">
+                <div class="gpt-progress-bar" id="gptProgressBar" style="width: 0%;"></div>
             </div>
-            <div class="stat-box">
-                <div class="stat-title">Words</div>
-                <div class="stat-value" id="wordCount">0</div>
+            <div class="gpt-info">
+                <span>Human-written</span>
+                <span>AI-generated</span>
             </div>
-        </div>
-
-        <div class="grammar-issues">
-            <h3>Issues Found</h3>
-            <ul class="issue-list" id="issueList">
-                <!-- Issues will be populated here -->
-            </ul>
         </div>
 
         <div class="popup" id="popup">
@@ -404,6 +450,7 @@
         const editor = document.getElementById('editor');
         const highlightContainer = document.getElementById('highlightContainer');
         const gptScore = document.getElementById('gptScore');
+        const gptProgressBar = document.getElementById('gptProgressBar');
         const grammarScore = document.getElementById('grammarScore');
         const wordCount = document.getElementById('wordCount');
         const issueList = document.getElementById('issueList');
@@ -458,11 +505,10 @@
             
             if (text.trim() === '') {
                 // Reset all stats and highlights
-                gptScore.textContent = '0%';
-                gptScore.className = 'stat-value';
-                grammarScore.textContent = '100%';
+                updateGptScore(0);
+                updateGrammarScore(100);
                 highlightContainer.innerHTML = '';
-                issueList.innerHTML = '';
+                issueList.innerHTML = '<li class="issue-item"><i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i><span class="issue-text">No grammar issues found!</span></li>';
                 loading.style.display = 'none';
                 return;
             }
@@ -473,21 +519,11 @@
                 const grammarIssues = checkGrammar(text);
                 
                 // Update GPT score
-                gptScore.textContent = `${gptPercentage}%`;
-                
-                // Set color based on score
-                gptScore.className = 'stat-value';
-                if (gptPercentage >= 70) {
-                    gptScore.classList.add('gpt-high');
-                } else if (gptPercentage >= 40) {
-                    gptScore.classList.add('gpt-medium');
-                } else {
-                    gptScore.classList.add('gpt-low');
-                }
+                updateGptScore(gptPercentage);
                 
                 // Update grammar score
                 const grammarPercentage = 100 - (grammarIssues.length * 5);
-                grammarScore.textContent = `${Math.max(0, grammarPercentage)}%`;
+                updateGrammarScore(Math.max(0, grammarPercentage));
                 
                 // Apply highlights
                 applyHighlights(text, gptPercentage, grammarIssues);
@@ -498,6 +534,34 @@
                 // Hide loading state
                 loading.style.display = 'none';
             }, 600);
+        }
+
+        function updateGptScore(score) {
+            gptScore.textContent = `${score}%`;
+            gptProgressBar.style.width = `${score}%`;
+            
+            // Set color based on score
+            gptScore.className = '';
+            if (score >= 70) {
+                gptScore.classList.add('gpt-high');
+            } else if (score >= 40) {
+                gptScore.classList.add('gpt-medium');
+            } else {
+                gptScore.classList.add('gpt-low');
+            }
+        }
+
+        function updateGrammarScore(score) {
+            grammarScore.textContent = score;
+            
+            // Set color based on score
+            if (score >= 90) {
+                grammarScore.style.backgroundColor = 'var(--success)';
+            } else if (score >= 70) {
+                grammarScore.style.backgroundColor = 'var(--warning)';
+            } else {
+                grammarScore.style.backgroundColor = 'var(--error)';
+            }
         }
 
         function simulateGptDetection(text) {
