@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CompText</title>
+    <title>NotePad</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #4361ee;
             --secondary: #7209b7;
-            --light-bg: #f8f9fa;
-            --light-text: #212529;
-            --dark-bg: #121212;
-            --dark-text: #e9ecef;
+            --light-bg: #f5f5f5;
+            --light-text: #333333;
+            --dark-bg: #1e1e1e;
+            --dark-text: #f0f0f0;
             --highlight: #4cc9f0;
             --error: #e63946;
             --warning: #ffb703;
             --success: #2a9d8f;
-            --border-radius: 8px;
+            --notepad-bg: #fff9c4;
+            --notepad-dark-bg: #3e3e30;
+            --border-radius: 0px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
@@ -39,42 +41,61 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1rem;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #2b579a;
+            color: white;
+            border-radius: var(--border-radius);
+        }
+
+        body.dark-mode header {
+            background-color: #1c3e6e;
         }
 
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
-            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .theme-toggle {
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle, .save-btn, .load-btn, .delete-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
-            color: var(--light-text);
+            font-size: 1rem;
+            color: white;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
         }
 
-        body.dark-mode .theme-toggle {
-            color: var(--dark-text);
+        .theme-toggle:hover, .save-btn:hover, .load-btn:hover, .delete-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .main-content {
             display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
         }
 
         .editor-section {
@@ -82,25 +103,24 @@
             min-width: 0;
         }
 
-        .grammar-section {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-        }
-
         .editor-container {
             position: relative;
             border-radius: var(--border-radius);
-            background-color: white;
+            background-color: var(--notepad-bg);
             box-shadow: var(--box-shadow);
             transition: var(--transition);
-            margin-bottom: 1rem;
-            height: calc(100vh - 220px);
+            margin-bottom: 0.5rem;
+            height: calc(100vh - 200px);
             min-height: 300px;
+            border-left: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            border-right: 1px solid #bbb;
+            border-bottom: 1px solid #bbb;
         }
 
         body.dark-mode .editor-container {
-            background-color: #1e1e1e;
+            background-color: var(--notepad-dark-bg);
+            border-color: #444;
         }
 
         .editor {
@@ -117,28 +137,94 @@
             color: var(--light-text);
             transition: var(--transition);
             box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         body.dark-mode .editor {
             color: var(--dark-text);
         }
 
-        .word-count {
+        .counts {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.875rem;
-            color: #6c757d;
-            margin-bottom: 1rem;
-            text-align: right;
+            color: #666;
+            margin-bottom: 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        body.dark-mode .counts {
+            color: #aaa;
+        }
+
+        /* Rolling Grammar Toolbar */
+        .grammar-toolbar {
+            position: absolute;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: var(--box-shadow);
+            transition: right 0.3s ease;
+            border: 1px solid #ddd;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .grammar-toolbar.open {
+            right: 0;
+        }
+
+        body.dark-mode .grammar-toolbar {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+
+        .grammar-toggle {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: white;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            padding: 0.75rem 0.5rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .grammar-toggle {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: white;
+        }
+
+        .grammar-toggle-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .grammar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .grammar-header {
+            border-color: #444;
         }
 
         .grammar-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
         }
 
@@ -146,54 +232,93 @@
             background-color: var(--success);
             color: white;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: 700;
+            font-size: 0.875rem;
         }
 
         .issue-list {
+            overflow-y: auto;
+            flex-grow: 1;
             padding: 0;
             margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
         }
 
         .issue-item {
-            list-style: none;
             padding: 0.75rem 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: var(--border-radius);
-            background-color: white;
-            box-shadow: var(--box-shadow);
-            display: flex;
-            align-items: center;
-            transition: var(--transition);
+            border-bottom: 1px solid #eee;
+            list-style: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .issue-item:hover {
+            background-color: #f9f9f9;
         }
 
         body.dark-mode .issue-item {
-            background-color: #1e1e1e;
+            border-color: #444;
+        }
+
+        body.dark-mode .issue-item:hover {
+            background-color: #333;
+        }
+
+        .issue-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
         }
 
         .issue-icon {
             margin-right: 0.75rem;
-            font-size: 1rem;
+            font-size: 0.875rem;
             color: var(--warning);
         }
 
-        .issue-text {
-            flex: 1;
+        .issue-type {
+            font-weight: 500;
             font-size: 0.875rem;
         }
 
-        .issue-suggestion {
-            font-weight: 500;
-            color: var(--primary);
-            cursor: pointer;
-            margin-left: 0.5rem;
+        .issue-text {
             font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        body.dark-mode .issue-text {
+            color: #aaa;
+        }
+
+        .issue-suggestion {
+            font-size: 0.875rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .issue-suggestion-text {
+            font-weight: 500;
+        }
+
+        .apply-suggestion {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .apply-suggestion:hover {
+            background-color: #3651d8;
         }
 
         .highlight-container {
@@ -205,11 +330,12 @@
             pointer-events: none;
             padding: 1rem;
             white-space: pre-wrap;
-            overflow: hidden;
+            overflow: auto;
             font-size: 1rem;
             line-height: 1.5;
             color: transparent;
             box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .gpt-highlight {
@@ -225,17 +351,19 @@
         .popup {
             position: absolute;
             background-color: white;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             padding: 0.75rem 1rem;
             font-size: 0.875rem;
             max-width: 300px;
             z-index: 10;
             display: none;
+            border: 1px solid #ddd;
         }
 
         body.dark-mode .popup {
             background-color: #2a2a2a;
+            border-color: #444;
         }
 
         .popup-title {
@@ -291,24 +419,25 @@
         .gpt-detection-section {
             background-color: white;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 1.5rem;
+            padding: 1rem;
             transition: var(--transition);
+            border: 1px solid #ddd;
         }
 
         body.dark-mode .gpt-detection-section {
-            background-color: #1e1e1e;
+            background-color: #2a2a2a;
+            border-color: #444;
         }
 
         .gpt-detection-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .gpt-detection-title {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 600;
         }
 
@@ -326,6 +455,10 @@
             margin-bottom: 0.5rem;
         }
 
+        body.dark-mode .gpt-progress {
+            background-color: #444;
+        }
+
         .gpt-progress-bar {
             height: 100%;
             background-color: var(--error);
@@ -336,8 +469,12 @@
         .gpt-info {
             display: flex;
             justify-content: space-between;
-            font-size: 0.875rem;
-            color: #6c757d;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        body.dark-mode .gpt-info {
+            color: #aaa;
         }
 
         .gpt-high {
@@ -352,431 +489,20 @@
             color: var(--success);
         }
 
-        @media (max-width: 900px) {
-            .main-content {
-                flex-direction: column;
-            }
-            
-            .grammar-section {
-                width: 100%;
-                margin-top: 1.5rem;
-            }
-
-            .editor-container {
-                height: 350px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-text-height"></i>
-                <span>CompText</span>
-            </div>
-            <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i>
-            </button>
-        </header>
-
-        <div class="main-content">
-            <div class="editor-section">
-                <div class="editor-container">
-                    <textarea id="editor" class="editor" placeholder="Type or paste your text here to analyze for AI detection and grammar issues..."></textarea>
-                    <div class="highlight-container" id="highlightContainer"></div>
-                    <div class="loading" id="loading" style="display: none;">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-                <div class="word-count">Words: <span id="wordCount">0</span></div>
-            </div>
-
-            <div class="grammar-section">
-                <div class="grammar-header">
-                    <div class="grammar-title">Grammar</div>
-                    <div class="grammar-score" id="grammarScore">100</div>
-                </div>
-                <ul class="issue-list" id="issueList">
-                    <!-- Grammar issues will be listed here -->
-                </ul>
-            </div>
-        </div>
-
-        <div class="gpt-detection-section">
-            <div class="gpt-detection-header">
-                <div class="gpt-detection-title">AI Content Detection</div>
-                <div class="gpt-score-container">
-                    <div id="gptScore" class="gpt-low">0%</div>
-                </div>
-            </div>
-            <div class="gpt-progress">
-                <div class="gpt-progress-bar" id="gptProgressBar" style="width: 0%;"></div>
-            </div>
-            <div class="gpt-info">
-                <span>Human-written</span>
-                <span>AI-generated</span>
-            </div>
-        </div>
-
-        <div class="popup" id="popup">
-            <div class="popup-title">AI Content Detected</div>
-            <div class="popup-content">
-                This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const toggleIcon = themeToggle.querySelector('i');
-
-        // Theme toggle without localStorage
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            
-            if (body.classList.contains('dark-mode')) {
-                toggleIcon.classList.remove('fa-moon');
-                toggleIcon.classList.add('fa-sun');
-            } else {
-                toggleIcon.classList.remove('fa-sun');
-                toggleIcon.classList.add('fa-moon');
-            }
-        });
-
-        // Text editor functionality
-        const editor = document.getElementById('editor');
-        const highlightContainer = document.getElementById('highlightContainer');
-        const gptScore = document.getElementById('gptScore');
-        const gptProgressBar = document.getElementById('gptProgressBar');
-        const grammarScore = document.getElementById('grammarScore');
-        const wordCount = document.getElementById('wordCount');
-        const issueList = document.getElementById('issueList');
-        const popup = document.getElementById('popup');
-        const loading = document.getElementById('loading');
-
-        // Set initial height to match textarea
-        highlightContainer.style.height = `${editor.offsetHeight}px`;
-
-        let typingTimer;
-        const typingInterval = 500; // Wait time after typing stops
-
-        editor.addEventListener('input', () => {
-            clearTimeout(typingTimer);
-            
-            // Update word count immediately
-            updateWordCount();
-            
-            // Show loading state
-            loading.style.display = 'flex';
-            
-            // Start analysis after typing stops
-            typingTimer = setTimeout(() => {
-                analyzeText();
-            }, typingInterval);
-        });
-
-        editor.addEventListener('scroll', () => {
-            // Sync highlight container scroll with textarea
-            highlightContainer.scrollTop = editor.scrollTop;
-        });
-
-        // Handle mouse over highlighted text
-        highlightContainer.addEventListener('mouseover', (e) => {
-            if (e.target.classList.contains('gpt-highlight')) {
-                showPopup(e.target);
-            }
-        });
-
-        highlightContainer.addEventListener('mouseout', () => {
-            popup.classList.remove('visible');
-        });
-
-        function updateWordCount() {
-            const text = editor.value;
-            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            wordCount.textContent = words;
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
         }
 
-        function analyzeText() {
-            const text = editor.value;
-            
-            if (text.trim() === '') {
-                // Reset all stats and highlights
-                updateGptScore(0);
-                updateGrammarScore(100);
-                highlightContainer.innerHTML = '';
-                issueList.innerHTML = '<li class="issue-item"><i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i><span class="issue-text">No grammar issues found!</span></li>';
-                loading.style.display = 'none';
-                return;
-            }
-
-            // Simulate API call for GPT detection
-            setTimeout(() => {
-                const gptPercentage = simulateGptDetection(text);
-                const grammarIssues = checkGrammar(text);
-                
-                // Update GPT score
-                updateGptScore(gptPercentage);
-                
-                // Update grammar score
-                const grammarPercentage = 100 - (grammarIssues.length * 5);
-                updateGrammarScore(Math.max(0, grammarPercentage));
-                
-                // Apply highlights
-                applyHighlights(text, gptPercentage, grammarIssues);
-                
-                // Update issue list
-                updateIssueList(grammarIssues);
-                
-                // Hide loading state
-                loading.style.display = 'none';
-            }, 600);
-        }
-
-        function updateGptScore(score) {
-            gptScore.textContent = `${score}%`;
-            gptProgressBar.style.width = `${score}%`;
-            
-            // Set color based on score
-            gptScore.className = '';
-            if (score >= 70) {
-                gptScore.classList.add('gpt-high');
-            } else if (score >= 40) {
-                gptScore.classList.add('gpt-medium');
-            } else {
-                gptScore.classList.add('gpt-low');
-            }
-        }
-
-        function updateGrammarScore(score) {
-            grammarScore.textContent = score;
-            
-            // Set color based on score
-            if (score >= 90) {
-                grammarScore.style.backgroundColor = 'var(--success)';
-            } else if (score >= 70) {
-                grammarScore.style.backgroundColor = 'var(--warning)';
-            } else {
-                grammarScore.style.backgroundColor = 'var(--error)';
-            }
-        }
-
-        function simulateGptDetection(text) {
-            // This is a simplified simulation of GPT detection
-            // In a real implementation, this would be an API call
-            
-            // List of patterns that are more common in AI-generated text
-            const aiPatterns = [
-                /furthermore/i,
-                /moreover/i,
-                /additionally/i,
-                /however,/i,
-                /nevertheless/i,
-                /consequently/i,
-                /in conclusion/i,
-                /to summarize/i,
-                /as a result/i,
-                /in essence/i,
-                /it is worth noting that/i,
-                /it is important to consider/i,
-                /it goes without saying/i,
-                /it should be emphasized that/i
-            ];
-            
-            // Check for patterns
-            let matchCount = 0;
-            aiPatterns.forEach(pattern => {
-                if (pattern.test(text)) {
-                    matchCount++;
-                }
-            });
-            
-            // Check for sentence variety
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-            const sentenceLengths = sentences.map(s => s.trim().split(/\s+/).length);
-            const sentenceVariety = calculateStandardDeviation(sentenceLengths);
-            
-            // Low standard deviation suggests uniform sentence length (more likely AI)
-            const varietyFactor = Math.min(sentenceVariety * 5, 20);
-            
-            // Calculate GPT score based on patterns and variety
-            const patternScore = (matchCount / aiPatterns.length) * 70;
-            const varietyScore = (1 - (varietyFactor / 20)) * 30;
-            const calculatedScore = Math.min(Math.round(patternScore + varietyScore), 99);
-            
-            // Add randomness for demo purposes
-            return Math.min(Math.max(calculatedScore + (Math.random() * 10 - 5), 1), 99);
-        }
-
-        function calculateStandardDeviation(values) {
-            if (values.length <= 1) return 0;
-            
-            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-            const squareDiffs = values.map(val => Math.pow(val - mean, 2));
-            const variance = squareDiffs.reduce((sum, val) => sum + val, 0) / values.length;
-            
-            return Math.sqrt(variance);
-        }
-
-        function checkGrammar(text) {
-            // Simplified grammar checking
-            // In a real implementation, this would use a grammar checking API
-            
-            const issues = [];
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-            
-            // Common issues to check for
-            const grammarPatterns = [
-                { pattern: /\b(their|they're|there)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(your|you're)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(its|it's)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(affect|effect)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(then|than)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(to|too|two)\b/gi, type: 'commonly confused words' },
-                { pattern: /\s[,.!?]|\s+$/g, type: 'punctuation spacing' },
-                { pattern: /\b(\w+)\s+\1\b/gi, type: 'repeated word' },
-                { pattern: /\b(alot|definately|seperate|recieve|accomodate)\b/gi, type: 'spelling' }
-            ];
-            
-            // Check for sentence capitalization
-            sentences.forEach((sentence, index) => {
-                const trimmedSentence = sentence.trim();
-                if (trimmedSentence.length > 0 && trimmedSentence[0] !== trimmedSentence[0].toUpperCase()) {
-                    const position = text.indexOf(trimmedSentence);
-                    if (position !== -1) {
-                        issues.push({
-                            index: position,
-                            length: 1,
-                            text: trimmedSentence.substring(0, 1),
-                            suggestion: trimmedSentence[0].toUpperCase(),
-                            message: 'Sentence should start with a capital letter'
-                        });
-                    }
-                }
-            });
-            
-            // Check for other grammar issues
-            grammarPatterns.forEach(({ pattern, type }) => {
-                let match;
-                while ((match = pattern.exec(text)) !== null) {
-                    // Skip patterns that are part of a URL
-                    const isInUrl = /https?:\/\/\S+/.test(text.substring(Math.max(0, match.index - 8), match.index + match[0].length + 8));
-                    if (!isInUrl) {
-                        issues.push({
-                            index: match.index,
-                            length: match[0].length,
-                            text: match[0],
-                            type: type,
-                            message: `Possible ${type} issue: "${match[0]}"`
-                        });
-                    }
-                }
-            });
-            
-            return issues;
-        }
-
-        function applyHighlights(text, gptPercentage, grammarIssues) {
-            // Create HTML with highlights
-            let html = escapeHtml(text);
-            
-            // Add grammar issue highlights
-            const fragments = [];
-            let lastIndex = 0;
-            
-            // Sort issues by index
-            grammarIssues.sort((a, b) => a.index - b.index);
-            
-            grammarIssues.forEach(issue => {
-                fragments.push(html.substring(lastIndex, issue.index));
-                fragments.push(`<span class="grammar-highlight" data-message="${escapeHtml(issue.message)}">`);
-                fragments.push(html.substring(issue.index, issue.index + issue.length));
-                fragments.push('</span>');
-                lastIndex = issue.index + issue.length;
-            });
-            
-            fragments.push(html.substring(lastIndex));
-            html = fragments.join('');
-            
-            // Add GPT detection highlights for high-probability sections
-            if (gptPercentage > 40) {
-                // Highlight some paragraphs (this is just a simple simulation)
-                const paragraphs = html.split('\n\n');
-                
-                for (let i = 0; i < paragraphs.length; i++) {
-                    // Higher chance of highlighting paragraphs when GPT score is high
-                    const highlightChance = gptPercentage / 100;
-                    
-                    if (paragraphs[i].length > 100 && Math.random() < highlightChance) {
-                        paragraphs[i] = `<span class="gpt-highlight">${paragraphs[i]}</span>`;
-                    }
-                }
-                
-                html = paragraphs.join('\n\n');
-            }
-            
-            // Apply the HTML to the highlight container
-            highlightContainer.innerHTML = html;
-        }
-
-        function updateIssueList(grammarIssues) {
-            issueList.innerHTML = '';
-            
-            if (grammarIssues.length === 0) {
-                const noIssues = document.createElement('li');
-                noIssues.className = 'issue-item';
-                noIssues.innerHTML = `
-                    <i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i>
-                    <span class="issue-text">No grammar issues found!</span>
-                `;
-                issueList.appendChild(noIssues);
-                return;
-            }
-            
-            grammarIssues.forEach(issue => {
-                const issueItem = document.createElement('li');
-                issueItem.className = 'issue-item';
-                
-                let suggestionHtml = '';
-                if (issue.suggestion) {
-                    suggestionHtml = `<span class="issue-suggestion">Replace with: "${issue.suggestion}"</span>`;
-                }
-                
-                issueItem.innerHTML = `
-                    <i class="fas fa-exclamation-triangle issue-icon"></i>
-                    <span class="issue-text">${issue.message}</span>
-                    ${suggestionHtml}
-                `;
-                
-                issueList.appendChild(issueItem);
-            });
-        }
-
-        function showPopup(target) {
-            const rect = target.getBoundingClientRect();
-            const editorContainerRect = document.querySelector('.editor-container').getBoundingClientRect();
-            
-            popup.style.top = `${rect.bottom - editorContainerRect.top + 10}px`;
-            popup.style.left = `${rect.left - editorContainerRect.left}px`;
-            popup.classList.add('visible');
-        }
-
-        function escapeHtml(text) {
-            return text
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // Initialize with sample text for demo
-        editor.value = "This text will be analyzed for AI content and grammar issues. Type or paste your own text to see real-time analysis.\n\nThe detector highlights sections that may have been generated by AI models such as GPT. It also checks for common grammar mistakes and gives you suggestions to improve your writing.";
-        updateWordCount();
-        analyzeText();
-    </script>
-</body>
-</html>
+        .modal {
+            background-c
