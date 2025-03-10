@@ -387,24 +387,16 @@
         const body = document.body;
         const toggleIcon = themeToggle.querySelector('i');
 
-        // Check for saved theme
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
-            toggleIcon.classList.remove('fa-moon');
-            toggleIcon.classList.add('fa-sun');
-        }
-
+        // Theme toggle without localStorage
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
             
             if (body.classList.contains('dark-mode')) {
                 toggleIcon.classList.remove('fa-moon');
                 toggleIcon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
             } else {
                 toggleIcon.classList.remove('fa-sun');
                 toggleIcon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
             }
         });
 
