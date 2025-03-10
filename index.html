@@ -1,158 +1,349 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>GPT-2 Output Detector</title>
-<meta charset="utf-8">
-<style type="text/css">
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: sans-serif;
-    margin: 0;
-    background: #ffffff;
-}
-
-h1 {
-    font-weight: lighter;
-}
-
-a {
-    text-decoration: none;
-    color: #666;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-#container {
-    margin: auto;
-    width: 960px;
-}
-
-#textbox {
-    font-family: serif;
-    font-size: 16pt;
-    width: 100%;
-    height: 480px;
-    padding: 20px 30px;
-    line-height: 1.6;
-}
-
-.bar-row {
-    height: 30px;
-}
-#real-percentage {
-    width: 80px;
-    vertical-align: top;
-}
-#bar-container {
-    width: 800px;
-    background-color: #ff7674;
-    line-height: 0.5;
-    position:relative;
-    top:6px;
-}
-#fake-percentage {
-    width: 80px;
-    vertical-align: top;
-}
-#bar {
-    display: inline-block;
-    height: 30px;
-    background-color: #83aaff;
-}
-em {
-    font-family: monospace;
-    font-style: normal;
-}
-</style>
-</head>
-<body>
-<div id="container">
-    <h1>GPT-2 Output Detector Demo</h1>
-    <p>
-        This is an online demo of the
-        <a href="https://github.com/openai/gpt-2-output-dataset/tree/master/detector">GPT-2 output detector</a>
-        model, based on the <a href="https://github.com/huggingface/transformers/commit/1c542df7e554a2014051dd09becf60f157fed524"><code>🤗/Transformers</code></a>
-        implementation of <a href="https://arxiv.org/abs/1907.11692">RoBERTa</a>. 
-        Enter some text in the text box; the predicted probabilities will be displayed below.
-        <u>The results start to get reliable after around 50 tokens.</u>
-    </p>
-    <textarea id="textbox" placeholder="Enter text here"></textarea>
-    <div><table cellspacing="0" cellpadding="0">
-        <tr class="bar-row" style="vertical-align: bottom;">
-            <td style="text-align: left;">Real</td>
-            <td id="message" style="text-align: center;"></td>
-            <td style="text-align: right;">Fake</td>
-        </tr>
-        <tr class="bar-row">
-            <td id="real-percentage" style="text-align: left; vertical-align: bottom;"></td>
-            <td id="bar-container"><div id="bar" style="width: 50%;"></div></td>
-            <td id="fake-percentage" style="text-align: right; vertical-align: bottom;"></td>
-        </tr>
-    </table></div>
-</div>
-<script>
-let textbox = document.getElementById('textbox');
-let last_submit = null;
-
-let real_percentage = document.getElementById('real-percentage');
-let fake_percentage = document.getElementById('fake-percentage');
-let bar = document.getElementById('bar');
-let message = document.getElementById('message');
-
-function update_graph(result) {
-    if (result === null) {
-        real_percentage.innerHTML = '';
-        fake_percentage.innerHTML = '';
-        bar.style.width = '50%';
-        message.innerHTML = '';
-    } else {
-        let percentage = result.real_probability;
-        real_percentage.innerHTML = (100 * percentage).toFixed(2) + '%';
-        fake_percentage.innerHTML = (100 * (1 - percentage)).toFixed(2) + '%';
-        bar.style.width = (100 * percentage).toFixed(2) + '%';
-        if (result.used_tokens === result.all_tokens) {
-            message.innerHTML = `Prediction based on ${result.used_tokens} tokens`;
-        } else {
-            message.innerHTML = `Prediction based on the first ${result.used_tokens} tokens among the total ${result.all_tokens}`;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroGPT - AI Content Detector</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-light: #f8fafc;
+            --text-dark: #1e293b;
+            --bg-light: #ffffff;
+            --bg-dark: #0f172a;
+            --card-light: #f1f5f9;
+            --card-dark: #1e293b;
+            --border-light: #e2e8f0;
+            --border-dark: #334155;
+            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
         }
-    }
-}
 
-textbox.oninput = () => {
-    if (last_submit) {
-        clearTimeout(last_submit);
-    }
-    if (textbox.value.length === 0) {
-        update_graph(null);
-        return;
-    }
-    message.innerText = 'Predicting ...';
-    last_submit = setTimeout(() => {
-        let req = new XMLHttpRequest();
-        if (textbox.value.length === 0) {
-            update_graph(null);
-            return;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
-        req.open('GET', window.location.href + '?' + textbox.value, true);
-        req.onreadystatechange = () => {
-            if (req.readyState !== 4) return;
-            if (req.status !== 200) throw new Error("HTTP status: " + req.status);
-            let result = JSON.parse(req.responseText);
-            update_graph(result);
-        };
-        req.send();
-    }, 1000);
 
-};
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
 
-window.addEventListener('DOMContentLoaded', () => {
-    textbox.focus();
-});
-</script>
-</body>
-</html>
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        body.dark-mode header {
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        main {
+            padding: 3rem 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: #64748b;
+        }
+
+        body.dark-mode .hero p {
+            color: #94a3b8;
+        }
+
+        .detector-card {
+            background-color: var(--card-light);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 2rem;
+        }
+
+        body.dark-mode .detector-card {
+            background-color: var(--card-dark);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            resize: vertical;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        body.dark-mode textarea {
+            background-color: rgba(15, 23, 42, 0.8);
+            border-color: var(--border-dark);
+            color: var(--text-light);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .word-count {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        body.dark-mode .word-count {
+            color: #94a3b8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+        }
+
+        body.dark-mode .btn-outline {
+            border-color: var(--border-dark);
+            color: var(--text-light);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .score-container {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .score-item {
+            background-color: var(--bg-light);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+            box-shadow: var(--shadow-light);
+        }
+
+        body.dark-mode .score-item {
+            background-color: rgba(30, 41, 59, 0.8);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .score-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+
+        body.dark-mode .score-label {
+            color: #94a3b8;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .human-score {
+            color: var(--success);
+        }
+
+        .ai-score {
+            color: var(--danger);
+        }
+
+        .text-highlight {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-light);
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        body.dark-mode .text-highlight {
+            background-color: rgba(30, 41, 59, 0.8);
+            border-color: var(--border-dark);
+        }
+
+        .highlight {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-bottom: 2px solid var(--danger);
+            border-radius: 0.25rem;
+            padding: 0.125rem 0;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            width: 200px;
+            background-color: #334155;
+            color: #fff;
+            text-align: center;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
