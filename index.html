@@ -505,4 +505,492 @@
         }
 
         .modal {
-            background-c
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .modal {
+            background-color: #2a2a2a;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        body.dark-mode .modal-close {
+            color: #aaa;
+        }
+
+        .save-form, .load-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        body.dark-mode .form-input {
+            background-color: #333;
+            border-color: #444;
+            color: white;
+        }
+
+        .saved-notes-list {
+            margin: 0;
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .saved-note-item {
+            list-style: none;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode .saved-note-item {
+            border-color: #444;
+        }
+
+        .saved-note-item:last-child {
+            border-bottom: none;
+        }
+
+        .note-info {
+            flex: 1;
+        }
+
+        .note-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .note-date {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        body.dark-mode .note-date {
+            color: #aaa;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .load-note-btn, .delete-note-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .load-note-btn {
+            color: var(--primary);
+        }
+
+        .load-note-btn:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .delete-note-btn {
+            color: var(--error);
+        }
+
+        .delete-note-btn:hover {
+            background-color: rgba(230, 57, 70, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3651d8;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .no-saved-notes {
+            text-align: center;
+            padding: 1rem;
+            color: #666;
+        }
+
+        body.dark-mode .no-saved-notes {
+            color: #aaa;
+        }
+
+        @media (max-width: 900px) {
+            .grammar-toolbar {
+                width: 260px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grammar-toolbar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .grammar-toggle {
+                left: -40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-sticky-note"></i>
+                <span>NotePad</span>
+            </div>
+            <div class="header-actions">
+                <button class="save-btn" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    <span>Save</span>
+                </button>
+                <button class="load-btn" id="loadBtn">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Load</span>
+                </button>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="editor-section">
+                <div class="editor-container">
+                    <textarea id="editor" class="editor" placeholder="Type or paste your text here..."></textarea>
+                    <div class="highlight-container" id="highlightContainer"></div>
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+                <div class="counts">
+                    <div>Words: <span id="wordCount">0</span></div>
+                    <div>Characters: <span id="charCount">0</span></div>
+                </div>
+            </div>
+
+            <!-- Rolling Grammar Toolbar -->
+            <div class="grammar-toolbar" id="grammarToolbar">
+                <div class="grammar-toggle" id="grammarToggle">
+                    <i class="fas fa-spell-check grammar-toggle-icon"></i>
+                    <div class="grammar-score" id="grammarScore">100</div>
+                </div>
+                <div class="grammar-header">
+                    <div class="grammar-title">Grammar & Style</div>
+                </div>
+                <ul class="issue-list" id="issueList">
+                    <!-- Grammar issues will be listed here -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="gpt-detection-section">
+            <div class="gpt-detection-header">
+                <div class="gpt-detection-title">AI Content Detection</div>
+                <div class="gpt-score-container">
+                    <div id="gptScore" class="gpt-low">0%</div>
+                </div>
+            </div>
+            <div class="gpt-progress">
+                <div class="gpt-progress-bar" id="gptProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="gpt-info">
+                <span>Human-written</span>
+                <span>AI-generated</span>
+            </div>
+        </div>
+
+        <div class="popup" id="popup">
+            <div class="popup-title">AI Content Detected</div>
+            <div class="popup-content">
+                This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Modal -->
+    <div class="modal-overlay" id="saveModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Save Note</div>
+                <button class="modal-close" id="closeSaveModal">&times;</button>
+            </div>
+            <form class="save-form" id="saveForm">
+                <div class="form-group">
+                    <label for="noteTitle" class="form-label">Note Title</label>
+                    <input type="text" id="noteTitle" class="form-input" placeholder="Enter a title for your note" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelSave">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load Modal -->
+    <div class="modal-overlay" id="loadModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Saved Notes</div>
+                <button class="modal-close" id="closeLoadModal">&times;</button>
+            </div>
+            <ul class="saved-notes-list" id="savedNotesList">
+                <!-- Saved notes will be listed here -->
+            </ul>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancelLoad">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const toggleIcon = themeToggle.querySelector('i');
+        const editor = document.getElementById('editor');
+        const highlightContainer = document.getElementById('highlightContainer');
+        const gptScore = document.getElementById('gptScore');
+        const gptProgressBar = document.getElementById('gptProgressBar');
+        const grammarScore = document.getElementById('grammarScore');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+        const issueList = document.getElementById('issueList');
+        const popup = document.getElementById('popup');
+        const loading = document.getElementById('loading');
+        const grammarToolbar = document.getElementById('grammarToolbar');
+        const grammarToggle = document.getElementById('grammarToggle');
+        
+        // Save/Load elements
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const saveModal = document.getElementById('saveModal');
+        const loadModal = document.getElementById('loadModal');
+        const closeSaveModal = document.getElementById('closeSaveModal');
+        const closeLoadModal = document.getElementById('closeLoadModal');
+        const cancelSave = document.getElementById('cancelSave');
+        const cancelLoad = document.getElementById('cancelLoad');
+        const saveForm = document.getElementById('saveForm');
+        const noteTitle = document.getElementById('noteTitle');
+        const savedNotesList = document.getElementById('savedNotesList');
+
+        // Grammar toolbar toggle
+        grammarToggle.addEventListener('click', () => {
+            grammarToolbar.classList.toggle('open');
+        });
+
+        // Theme toggle functionality
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+                try {
+                    document.cookie = "theme=dark; path=/; max-age=31536000"; // 1 year
+                } catch (e) {
+                    console.error("Could not set theme cookie:", e);
+                }
+            } else {
+                toggleIcon.classList.remove('fa-sun');
+                toggleIcon.classList.add('fa-moon');
+                try {
+                    document.cookie = "theme=light; path=/; max-age=31536000";
+                } catch (e) {
+                    console.error("Could not set theme cookie:", e);
+                }
+            }
+        });
+
+        // Check for saved theme in cookies
+        function getCookie(name) {
+            try {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            } catch (e) {
+                console.error("Error reading cookie:", e);
+                return null;
+            }
+        }
+
+        try {
+            const savedTheme = getCookie('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+            }
+        } catch (e) {
+            console.error("Error reading theme cookie:", e);
+        }
+
+        // Set initial height to match textarea
+        highlightContainer.style.height = `${editor.offsetHeight}px`;
+
+        let typingTimer;
+        const typingInterval = 500; // Wait time after typing stops
+
+        editor.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            
+            // Update word count and character count immediately
+            updateCounts();
+            
+            // Show loading state
+            loading.style.display = 'flex';
+            
+            // Start analysis after typing stops
+            typingTimer = setTimeout(() => {
+                analyzeText();
+            }, typingInterval);
+        });
+
+        // Ensure highlight container scrolls with textarea
+        editor.addEventListener('scroll', () => {
+            highlightContainer.scrollTop = editor.scrollTop;
+            highlightContainer.scrollLeft = editor.scrollLeft;
+        });
+
+        // Handle mouse over highlighted text
+        highlightContainer.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('gpt-highlight')) {
+                showPopup(e.target);
+            }
+        });
+
+        highlightContainer.addEventListener('mouseout', () => {
+            popup.classList.remove('visible');
+        });
+
+        function updateCounts() {
+            const text = editor.value;
+            // Word count
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCount.textContent = words;
+            // Character count
+            charCount.textContent = text.length;
+        }
+
+        function analyzeText() {
+            const text = editor.value;
+            
+            if (text.trim() === '') {
+                // Reset all stats and highlights
+                updateGptScore(0);
+                updateGrammarScore(100);
+                highlightContainer.innerHTML = '';
+                issueList.innerHTML = '<li class="issue-item"><i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i><span class="issue-text">No grammar issues found!</span></li>';
+                loading.style.display = 'none';
+                return;
+            }
+
+            // Simulate API call for GPT detection
+            setTimeout(() => {
+                const gptPercentage = simulateGptDetection(text);
+                const grammarIssues = checkGrammar(text);
+                
+                // Update GPT score
+                updateGptScore(gptPercentage);
+                
+                // Update grammar score
+                const grammarPercentage = 100 - (grammarIssues.length * 5);
+                updateGrammarScore(Math.max(0, grammarPercentage));
+                
+                // Apply highlights
+                applyHighlights(text, gptPercentage, grammarIssues);
+                
+                // Update issue list
+                updateIssueList(grammarIssues);
+                
+                // Open grammar toolbar if there are issues
+                if (grammarIssues.length > 0) {
+                    grammarToolbar.classList.add('open');
+                }
+                
+                // Hide loading state
+                loading.style.display = 'none';
+            }, 600);
+        }
+
+        function updateGptScore(score) {
+            gptScore.textContent = `${score}%`;
+            gptProgressBar.style.width = `${score}%`;
+            
+            // Set color based on score
+            g
