@@ -991,6 +991,64 @@
     </div>
 
     <script>
+        // Storage functions - using sessionStorage as a fallback when localStorage is unavailable
+        const storage = {
+            available: (function() {
+                try {
+                    const testKey = '__storage_test__';
+                    localStorage.setItem(testKey, testKey);
+                    localStorage.removeItem(testKey);
+                    return true;
+                } catch(e) {
+                    return false;
+                }
+            })(),
+            
+            getItem: function(key) {
+                if (this.available) {
+                    return localStorage.getItem(key);
+                } else {
+                    return sessionStorage.getItem(key);
+                }
+            },
+            
+            setItem: function(key, value) {
+                if (this.available) {
+                    localStorage.setItem(key, value);
+                } else {
+                    sessionStorage.setItem(key, value);
+                }
+            },
+            
+            removeItem: function(key) {
+                if (this.available) {
+                    localStorage.removeItem(key);
+                } else {
+                    sessionStorage.removeItem(key);
+                }
+            },
+            
+            getAllKeys: function() {
+                const keys = [];
+                if (this.available) {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('notepad_')) {
+                            keys.push(key);
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < sessionStorage.length; i++) {
+                        const key = sessionStorage.key(i);
+                        if (key.startsWith('notepad_')) {
+                            keys.push(key);
+                        }
+                    }
+                }
+                return keys;
+            }
+        };
+        
         // DOM Elements
         const themeButton = document.getElementById('themeButton');
         const themeDropdown = document.getElementById('themeDropdown');
@@ -1006,4 +1064,15 @@
         const loading = document.getElementById('loading');
         
         // Save/Files Modal Elements
-        const sa
+        const saveButton = document.getElementById('saveButton');
+        const filesButton = document.getElementById('filesButton');
+        const saveModal = document.getElementById('saveModal');
+        const saveModalClose = document.getElementById('saveModalClose');
+        const saveCancelButton = document.getElementById('saveCancelButton');
+        const saveConfirmButton = document.getElementById('saveConfirmButton');
+        const saveFileName = document.getElementById('saveFileName');
+        const filesModal = document.getElementById('filesModal');
+        const filesModalClose = document.getElementById('filesModalClose');
+        const filesCancelButton = document.getElementById('filesCancelButton');
+        const filesList = document.getElementById('filesList');
+        const noFilesMessage = document.getElementById('noFilesMessage');
