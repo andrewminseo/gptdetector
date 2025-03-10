@@ -3,62 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZeroGPT - AI Content Detector</title>
+    <title>GPT Detector</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --text-light: #f8fafc;
-            --text-dark: #1e293b;
-            --bg-light: #ffffff;
-            --bg-dark: #0f172a;
-            --card-light: #f1f5f9;
-            --card-dark: #1e293b;
-            --border-light: #e2e8f0;
-            --border-dark: #334155;
-            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --shadow-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --info: #0ea5e9;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            --primary: #4361ee;
+            --secondary: #7209b7;
+            --light-bg: #f8f9fa;
+            --light-text: #212529;
+            --dark-bg: #121212;
+            --dark-text: #e9ecef;
+            --highlight: #4cc9f0;
+            --error: #e63946;
+            --warning: #ffb703;
+            --success: #2a9d8f;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
 
         body {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            transition: var(--transition);
         }
 
         body.dark-mode {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 2rem;
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        body.dark-mode header {
-            border-bottom: 1px solid var(--border-dark);
+            margin-bottom: 2rem;
         }
 
         .logo {
@@ -70,852 +58,512 @@
             gap: 0.5rem;
         }
 
-        nav ul {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: inherit;
-            font-weight: 500;
-            position: relative;
-        }
-
-        nav a:hover {
-            color: var(--primary);
-        }
-
-        nav a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: var(--primary);
-            transition: width 0.3s;
-        }
-
-        nav a:hover::after {
-            width: 100%;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
         .theme-toggle {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.25rem;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--light-text);
+            transition: var(--transition);
         }
 
-        main {
-            padding: 3rem 0;
+        body.dark-mode .theme-toggle {
+            color: var(--dark-text);
         }
 
-        .hero {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, var(--primary), #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero p {
-            font-size: 1.125rem;
-            max-width: 700px;
-            margin: 0 auto;
-            color: #64748b;
-        }
-
-        body.dark-mode .hero p {
-            color: #94a3b8;
-        }
-
-        .detector-card {
-            background-color: var(--card-light);
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: var(--shadow-light);
-            margin-bottom: 2rem;
-        }
-
-        body.dark-mode .detector-card {
-            background-color: var(--card-dark);
-            box-shadow: var(--shadow-dark);
-        }
-
-        .input-container {
+        .editor-container {
             position: relative;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
             margin-bottom: 1.5rem;
         }
 
-        textarea {
+        body.dark-mode .editor-container {
+            background-color: #1e1e1e;
+        }
+
+        .editor {
             width: 100%;
-            min-height: 200px;
+            min-height: 300px;
             padding: 1rem;
-            border: 1px solid var(--border-light);
-            border-radius: 0.5rem;
-            resize: vertical;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
             font-size: 1rem;
             line-height: 1.5;
-        }
-
-        body.dark-mode textarea {
-            background-color: rgba(15, 23, 42, 0.8);
-            border-color: var(--border-dark);
-            color: var(--text-light);
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .word-count {
-            position: absolute;
-            bottom: 0.5rem;
-            right: 0.5rem;
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        body.dark-mode .word-count {
-            color: #94a3b8;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        button {
-            padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-outline {
+            border-radius: var(--border-radius);
+            outline: none;
+            resize: none;
             background-color: transparent;
-            border: 1px solid var(--border-light);
-            color: var(--text-dark);
+            color: var(--light-text);
+            transition: var(--transition);
         }
 
-        body.dark-mode .btn-outline {
-            border-color: var(--border-dark);
-            color: var(--text-light);
+        body.dark-mode .editor {
+            color: var(--dark-text);
         }
 
-        .btn-outline:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .btn-outline:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .result-container {
-            display: none;
-            margin-top: 2rem;
-        }
-
-        .result-header {
+        .stats-container {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
-        .result-title {
-            font-size: 1.25rem;
-            font-weight: 600;
+        .stat-box {
+            flex: 1;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            margin-right: 1rem;
+            transition: var(--transition);
         }
 
-        .score-container {
-            display: flex;
-            gap: 1.5rem;
+        .stat-box:last-child {
+            margin-right: 0;
         }
 
-        .score-item {
-            background-color: var(--bg-light);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 120px;
-            box-shadow: var(--shadow-light);
+        body.dark-mode .stat-box {
+            background-color: #1e1e1e;
         }
 
-        body.dark-mode .score-item {
-            background-color: rgba(30, 41, 59, 0.8);
-            box-shadow: var(--shadow-dark);
-        }
-
-        .score-label {
+        .stat-title {
             font-size: 0.875rem;
-            color: #64748b;
-            margin-bottom: 0.25rem;
-        }
-
-        body.dark-mode .score-label {
-            color: #94a3b8;
-        }
-
-        .score-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .human-score {
-            color: var(--success);
-        }
-
-        .ai-score {
-            color: var(--danger);
-        }
-
-        .text-highlight {
-            background-color: var(--bg-light);
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-top: 1.5rem;
-            border: 1px solid var(--border-light);
-            white-space: pre-wrap;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-
-        body.dark-mode .text-highlight {
-            background-color: rgba(30, 41, 59, 0.8);
-            border-color: var(--border-dark);
-        }
-
-        .highlight {
-            background-color: rgba(239, 68, 68, 0.2);
-            border-bottom: 2px solid var(--danger);
-            border-radius: 0.25rem;
-            padding: 0.125rem 0;
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-content {
-            visibility: hidden;
-            width: 200px;
-            background-color: #334155;
-            color: #fff;
-            text-align: center;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.875rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        }
-
-        .tooltip-content::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #334155 transparent transparent transparent;
-        }
-
-        .tooltip:hover .tooltip-content {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .detector-services {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        .service-card {
-            background-color: var(--card-light);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-light);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        body.dark-mode .service-card {
-            background-color: var(--card-dark);
-            box-shadow: var(--shadow-dark);
-        }
-
-        .service-icon {
-            width: 3rem;
-            height: 3rem;
-            background-color: rgba(99, 102, 241, 0.1);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.75rem;
-            font-size: 1.25rem;
-        }
-
-        .service-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-
-        .service-desc {
-            color: #64748b;
-            font-size: 0.9375rem;
-        }
-
-        body.dark-mode .service-desc {
-            color: #94a3b8;
-        }
-
-        .popup {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #334155;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            transition: top 0.3s ease-out;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .popup.show {
-            top: 20px;
-        }
-
-        .popup-icon {
-            font-size: 1.25rem;
-        }
-
-        .api-section {
-            margin-top: 4rem;
-            background-color: var(--card-light);
-            border-radius: 1rem;
-            padding: 2rem;
-            box-shadow: var(--shadow-light);
-        }
-
-        body.dark-mode .api-section {
-            background-color: var(--card-dark);
-            box-shadow: var(--shadow-dark);
-        }
-
-        .api-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .api-title {
-            font-size: 1.5rem;
+            color: #6c757d;
             margin-bottom: 0.5rem;
         }
 
-        .api-desc {
-            color: #64748b;
-        }
-
-        body.dark-mode .api-desc {
-            color: #94a3b8;
-        }
-
-        .code-block {
-            background-color: #1e293b;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            font-family: 'Fira Code', monospace;
-            overflow-x: auto;
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
-        }
-
-        footer {
-            background-color: var(--card-light);
-            padding: 3rem 0;
-            margin-top: 4rem;
-        }
-
-        body.dark-mode footer {
-            background-color: var(--card-dark);
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 3rem;
-        }
-
-        .footer-logo {
+        .stat-value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .footer-desc {
-            color: #64748b;
-            margin-bottom: 1.5rem;
-            max-width: 400px;
+        .gpt-high {
+            color: var(--error);
         }
 
-        body.dark-mode .footer-desc {
-            color: #94a3b8;
+        .gpt-medium {
+            color: var(--warning);
         }
 
-        .footer-section h3 {
-            font-size: 1.125rem;
-            margin-bottom: 1.25rem;
-            font-weight: 600;
+        .gpt-low {
+            color: var(--success);
         }
 
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.75rem;
-        }
-
-        .footer-links a {
-            text-decoration: none;
-            color: #64748b;
-            transition: color 0.2s;
-        }
-
-        body.dark-mode .footer-links a {
-            color: #94a3b8;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1.25rem;
+        .grammar-issues {
             margin-top: 1.5rem;
         }
 
-        .social-icon {
-            background-color: rgba(99, 102, 241, 0.1);
+        .issue-list {
+            padding: 0;
+        }
+
+        .issue-item {
+            list-style: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .issue-item {
+            background-color: #1e1e1e;
+        }
+
+        .issue-icon {
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            color: var(--warning);
+        }
+
+        .issue-text {
+            flex: 1;
+        }
+
+        .issue-suggestion {
+            font-weight: 500;
             color: var(--primary);
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            cursor: pointer;
+            margin-left: 0.5rem;
         }
 
-        .social-icon:hover {
-            background-color: var(--primary);
-            color: white;
+        .highlight-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            padding: 1rem;
+            white-space: pre-wrap;
+            overflow: hidden;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: transparent;
         }
 
-        .footer-bottom {
-            margin-top: 3rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #64748b;
+        .gpt-highlight {
+            background-color: rgba(230, 57, 70, 0.2);
+            border-bottom: 2px solid var(--error);
+        }
+
+        .grammar-highlight {
+            background-color: rgba(255, 183, 3, 0.2);
+            border-bottom: 2px solid var(--warning);
+        }
+
+        .popup {
+            position: absolute;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 0.75rem 1rem;
             font-size: 0.875rem;
+            max-width: 300px;
+            z-index: 10;
+            display: none;
         }
 
-        body.dark-mode .footer-bottom {
-            border-color: var(--border-dark);
-            color: #94a3b8;
+        body.dark-mode .popup {
+            background-color: #2a2a2a;
         }
 
-        @media (max-width: 768px) {
-            nav ul {
-                display: none;
-            }
+        .popup-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--error);
+        }
 
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
+        .popup-content {
+            line-height: 1.4;
+        }
 
-            .footer-bottom {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
+        .popup.visible {
+            display: block;
+        }
+
+        .progress-circle {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-dasharray: 283;
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+            stroke-linecap: round;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            font-weight: 700;
         }
 
         .loading {
-            display: none;
-            text-align: center;
-            margin: 2rem 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: var(--border-radius);
+            z-index: 5;
+        }
+
+        body.dark-mode .loading {
+            background-color: rgba(30, 30, 30, 0.8);
         }
 
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
-            border-left-color: var(--primary);
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
         }
 
         body.dark-mode .spinner {
             border-color: rgba(255, 255, 255, 0.1);
-            border-left-color: var(--primary);
+            border-top-color: var(--primary);
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: inherit;
-            font-size: 1.5rem;
-            cursor: pointer;
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6c757d;
         }
 
         @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
+            .container {
+                padding: 1rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-box {
+                margin-right: 0;
+                margin-bottom: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="popup" id="popup">
-        <div class="popup-icon"><i class="fas fa-robot"></i></div>
-        <div class="popup-message">AI-generated content detected!</div>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>GPT Detector</span>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </header>
+
+        <div class="editor-container">
+            <textarea id="editor" class="editor" placeholder="Type or paste your text here to analyze for AI detection and grammar issues..."></textarea>
+            <div class="highlight-container" id="highlightContainer"></div>
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-title">GPT Detection</div>
+                <div class="stat-value" id="gptScore">0%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Grammar Score</div>
+                <div class="stat-value" id="grammarScore">100%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Words</div>
+                <div class="stat-value" id="wordCount">0</div>
+            </div>
+        </div>
+
+        <div class="grammar-issues">
+            <h3>Issues Found</h3>
+            <ul class="issue-list" id="issueList">
+                <!-- Issues will be populated here -->
+            </ul>
+        </div>
+
+        <div class="popup" id="popup">
+            <div class="popup-title">AI Content Detected</div>
+            <div class="popup-content">
+                This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
+            </div>
+        </div>
     </div>
 
-    <header>
-        <div class="container">
-            <div class="nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <div class="logo">
-                    <i class="fas fa-shield-halved"></i>
-                    <span>ZeroGPT</span>
-                </div>
-                <nav>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Chat GPT Detector</a></li>
-                        <li><a href="#">AI Content Detector</a></li>
-                        <li><a href="#">API</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </nav>
-                <div class="nav-right">
-                    <button class="theme-toggle" id="theme-toggle">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    <button class="mobile-menu-btn">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <div class="container">
-            <section class="hero">
-                <h1>Advanced AI Content Detection</h1>
-                <p>Detect AI-generated content with precision. Our multi-model detection system identifies text created by ChatGPT, GPT-4, Claude, and other large language models.</p>
-            </section>
-
-            <div class="detector-card">
-                <div class="input-container">
-                    <textarea id="content-input" placeholder="Paste your text here to analyze (minimum 100 characters recommended for accurate results)..."></textarea>
-                    <div class="word-count"><span id="word-count">0</span> words</div>
-                </div>
-                <div class="button-group">
-                    <button class="btn-primary" id="analyze-btn">
-                        <i class="fas fa-magnifying-glass"></i> Analyze Text
-                    </button>
-                    <button class="btn-outline" id="clear-btn">
-                        <i class="fas fa-xmark"></i> Clear
-                    </button>
-                </div>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Analyzing content across multiple AI detection models...</p>
-                </div>
-
-                <div class="result-container" id="result-container">
-                    <div class="result-header">
-                        <div class="result-title">Analysis Results</div>
-                        <div class="score-container">
-                            <div class="score-item">
-                                <div class="score-label">Human Score</div>
-                                <div class="score-value human-score" id="human-score">0%</div>
-                            </div>
-                            <div class="score-item">
-                                <div class="score-label">AI Score</div>
-                                <div class="score-value ai-score" id="ai-score">0%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-highlight" id="text-highlight"></div>
-                </div>
-            </div>
-
-            <div class="detector-services">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="service-title">Multi-Model Detection</div>
-                    <div class="service-desc">Our system analyzes content across multiple LLM detectors to provide accurate and comprehensive results.</div>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-magnifying-glass-chart"></i>
-                    </div>
-                    <div class="service-title">Pattern Analysis</div>
-                    <div class="service-desc">Identifies statistical patterns and linguistic markers characteristic of AI-generated content.</div>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div class="service-title">Developer API</div>
-                    <div class="service-desc">Integrate our AI detection capabilities directly into your applications with our robust API.</div>
-                </div>
-            </div>
-
-            <section class="api-section">
-                <div class="api-header">
-                    <h2 class="api-title">ZeroGPT AI Detection API</h2>
-                    <p class="api-desc">Integrate our powerful AI content detection capabilities into your own applications with our easy-to-use API.</p>
-                </div>
-                <div class="code-block">
-<pre>// API Endpoint: /api/v1/detectText
-// HTTP Method: POST
-
-// Request Body:
-{
-  "input_text": "Text to analyze for AI generation"
-}
-
-// Response:
-{
-  "success": true,
-  "data": {
-    "is_human_written": 15,
-    "is_gpt_generated": 85,
-    "feedback_message": "This text shows strong indicators of AI generation",
-    "gpt_generated_sentences": [],
-    "words_count": 127
-  }
-}</pre>
-                </div>
-                <button class="btn-primary">Get API Access</button>
-            </section>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <i class="fas fa-shield-halved"></i>
-                        <span>ZeroGPT</span>
-                    </div>
-                    <p class="footer-desc">ZeroGPT provides advanced AI detection tools to help identify content generated by large language models like ChatGPT, GPT-4, and others.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Chat GPT Detector</a></li>
-                        <li><a href="#">AI Content Detector</a></li>
-                        <li><a href="#">API Documentation</a></li>
-                        <li><a href="#">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Support</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div>© 2025 ZeroGPT. All rights reserved.</div>
-                <div>
-                    <a href="#" style="color: inherit; margin-right: 1rem;">Terms</a>
-                    <a href="#" style="color: inherit;">Privacy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <script>
-        // Dark mode toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-        
-        // Check for saved theme preference or use system preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.body.classList.add('dark-mode');
-            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const toggleIcon = themeToggle.querySelector('i');
+
+        // Check for saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            toggleIcon.classList.remove('fa-moon');
+            toggleIcon.classList.add('fa-sun');
         }
-        
+
         themeToggle.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
+            body.classList.toggle('dark-mode');
             
-            if (document.body.classList.contains('dark-mode')) {
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            if (body.classList.contains('dark-mode')) {
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
                 localStorage.setItem('theme', 'dark');
             } else {
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                toggleIcon.classList.remove('fa-sun');
+                toggleIcon.classList.add('fa-moon');
                 localStorage.setItem('theme', 'light');
             }
         });
-        
-        // Word counter
-        const contentInput = document.getElementById('content-input');
-        const wordCount = document.getElementById('word-count');
-        
-        contentInput.addEventListener('input', () => {
-            const text = contentInput.value.trim();
-            const words = text ? text.split(/\s+/).length : 0;
-            wordCount.textContent = words;
-        });
-        
-        // Clear button
-        const clearBtn = document.getElementById('clear-btn');
-        clearBtn.addEventListener('click', () => {
-            contentInput.value = '';
-            wordCount.textContent = '0';
-            document.getElementById('result-container').style.display = 'none';
-        });
-        
-        // Analyze button - this would integrate with actual detection API
-        const analyzeBtn = document.getElementById('analyze-btn');
-        const resultContainer = document.getElementById('result-container');
-        const textHighlight = document.getElementById('text-highlight');
-        const humanScore = document.getElementById('human-score');
-        const aiScore = document.getElementById('ai-score');
-        const loading = document.getElementById('loading');
+
+        // Text editor functionality
+        const editor = document.getElementById('editor');
+        const highlightContainer = document.getElementById('highlightContainer');
+        const gptScore = document.getElementById('gptScore');
+        const grammarScore = document.getElementById('grammarScore');
+        const wordCount = document.getElementById('wordCount');
+        const issueList = document.getElementById('issueList');
         const popup = document.getElementById('popup');
-        
-        analyzeBtn.addEventListener('click', () => {
-            const text = contentInput.value.trim();
+        const loading = document.getElementById('loading');
+
+        // Set initial height to match textarea
+        highlightContainer.style.height = `${editor.offsetHeight}px`;
+
+        let typingTimer;
+        const typingInterval = 500; // Wait time after typing stops
+
+        editor.addEventListener('input', () => {
+            clearTimeout(typingTimer);
             
-            if (text.length < 50) {
-                alert('Please enter at least 50 characters for accurate analysis.');
-                return;
-            }
+            // Update word count immediately
+            updateWordCount();
             
             // Show loading state
-            loading.style.display = 'block';
-            resultContainer.style.display = 'none';
+            loading.style.display = 'flex';
             
-            // Simulate API call with timeout
-            setTimeout(() => {
-                loading.style.display = 'none';
-                resultContainer.style.display = 'block';
-                
-                // This would be replaced with actual API response processing
-                analyzeText(text);
-            }, 1500);
+            // Start analysis after typing stops
+            typingTimer = setTimeout(() => {
+                analyzeText();
+            }, typingInterval);
         });
-        
-        function analyzeText(text) {
-            // Demo implementation - would be replaced with actual detection logic
-            // For this demo, we'll use a simple algorithm that looks for common LLM patterns
+
+        editor.addEventListener('scroll', () => {
+            // Sync highlight container scroll with textarea
+            highlightContainer.scrollTop = editor.scrollTop;
+        });
+
+        // Handle mouse over highlighted text
+        highlightContainer.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('gpt-highlight')) {
+                showPopup(e.target);
+            }
+        });
+
+        highlightContainer.addEventListener('mouseout', () => {
+            popup.classList.remove('visible');
+        });
+
+        function updateWordCount() {
+            const text = editor.value;
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCount.textContent = words;
+        }
+
+        function analyzeText() {
+            const text = editor.value;
             
-            const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-            const totalSentences = sentences.length;
+            if (text.trim() === '') {
+                // Reset all stats and highlights
+                gptScore.textContent = '0%';
+                gptScore.className = 'stat-value';
+                grammarScore.textContent = '100%';
+                highlightContainer.innerHTML = '';
+                issueList.innerHTML = '';
+                loading.style.display = 'none';
+                return;
+            }
+
+            // Simulate API call for GPT detection
+            setTimeout(() => {
+                const gptPercentage = simulateGptDetection(text);
+                const grammarIssues = checkGrammar(text);
+                
+                // Update GPT score
+                gptScore.textContent = `${gptPercentage}%`;
+                
+                // Set color based on score
+                gptScore.className = 'stat-value';
+                if (gptPercentage >= 70) {
+                    gptScore.classList.add('gpt-high');
+                } else if (gptPercentage >= 40) {
+                    gptScore.classList.add('gpt-medium');
+                } else {
+                    gptScore.classList.add('gpt-low');
+                }
+                
+                // Update grammar score
+                const grammarPercentage = 100 - (grammarIssues.length * 5);
+                grammarScore.textContent = `${Math.max(0, grammarPercentage)}%`;
+                
+                // Apply highlights
+                applyHighlights(text, gptPercentage, grammarIssues);
+                
+                // Update issue list
+                updateIssueList(grammarIssues);
+                
+                // Hide loading state
+                loading.style.display = 'none';
+            }, 600);
+        }
+
+        function simulateGptDetection(text) {
+            // This is a simplified simulation of GPT detection
+            // In a real implementation, this would be an API call
             
-            // Patterns that might indicate AI-generated content (simplified for demo)
-            const llmPatterns = [
-                /\b(however|nevertheless|moreover|furthermore|in addition|consequently)\b/i,
-                /\b(it is \w+ that|it is \w+ to note|it is \w+ to mention)\b/i,
-                /\b(to summarize|in conclusion|in summary|to conclude)\b/i,
-                /\bas (mentioned|discussed|noted) (above|earlier|previously)\b/i,
-                /\b(firstly|secondly|thirdly|finally|ultimately)\b/i,
-                /\b(one could argue|one might say)\b/i
+            // List of patterns that are more common in AI-generated text
+            const aiPatterns = [
+                /furthermore/i,
+                /moreover/i,
+                /additionally/i,
+                /however,/i,
+                /nevertheless/i,
+                /consequently/i,
+                /in conclusion/i,
+                /to summarize/i,
+                /as a result/i,
+                /in essence/i,
+                /it is worth noting that/i,
+                /it is important to consider/i,
+                /it goes without saying/i,
+                /it should be emphasized that/i
             ];
             
-            // Count sentences matching patterns
-            let markedSentences = [];
-            const markedIndexes = new Set();
+            // Check for patterns
+            let matchCount = 0;
+            aiPatterns.forEach(pattern => {
+                if (pattern.test(text)) {
+                    matchCount++;
+                }
+            });
             
-            sentences.forEach((sentence, index
+            // Check for sentence variety
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const sentenceLengths = sentences.map(s => s.trim().split(/\s+/).length);
+            const sentenceVariety = calculateStandardDeviation(sentenceLengths);
+            
+            // Low standard deviation suggests uniform sentence length (more likely AI)
+            const varietyFactor = Math.min(sentenceVariety * 5, 20);
+            
+            // Calculate GPT score based on patterns and variety
+            const patternScore = (matchCount / aiPatterns.length) * 70;
+            const varietyScore = (1 - (varietyFactor / 20)) * 30;
+            const calculatedScore = Math.min(Math.round(patternScore + varietyScore), 99);
+            
+            // Add randomness for demo purposes
+            return Math.min(Math.max(calculatedScore + (Math.random() * 10 - 5), 1), 99);
+        }
+
+        function calculateStandardDeviation(values) {
+            if (values.length <= 1) return 0;
+            
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+            const squareDiffs = values.map(val => Math.pow(val - mean, 2));
+            const variance = squareDiffs.reduce((sum, val) => sum + val, 0) / values.length;
+            
+            return Math.sqrt(variance);
+        }
+
+        function checkGrammar(text) {
+            // Simplifie
