@@ -347,3 +347,350 @@
             bottom: 125%;
             left: 50%;
             transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.875rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tooltip-content::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #334155 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .detector-services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background-color: var(--card-light);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        body.dark-mode .service-card {
+            background-color: var(--card-dark);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .service-icon {
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .service-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .service-desc {
+            color: #64748b;
+            font-size: 0.9375rem;
+        }
+
+        body.dark-mode .service-desc {
+            color: #94a3b8;
+        }
+
+        .popup {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #334155;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: top 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .popup.show {
+            top: 20px;
+        }
+
+        .popup-icon {
+            font-size: 1.25rem;
+        }
+
+        .api-section {
+            margin-top: 4rem;
+            background-color: var(--card-light);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        body.dark-mode .api-section {
+            background-color: var(--card-dark);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .api-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .api-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-desc {
+            color: #64748b;
+        }
+
+        body.dark-mode .api-desc {
+            color: #94a3b8;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        footer {
+            background-color: var(--card-light);
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        body.dark-mode footer {
+            background-color: var(--card-dark);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-desc {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        body.dark-mode .footer-desc {
+            color: #94a3b8;
+        }
+
+        .footer-section h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: #64748b;
+            transition: color 0.2s;
+        }
+
+        body.dark-mode .footer-links a {
+            color: #94a3b8;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icon {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .social-icon:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        body.dark-mode .footer-bottom {
+            border-color: var(--border-dark);
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        body.dark-mode .spinner {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="popup" id="popup">
+        <div class="popup-icon"><i class="fas fa-robot"></i></div>
+        <div class="popup-message">AI-generated content detected!</div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="nav-wrapper" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="logo">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>ZeroGPT</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Chat GPT Detector</a></li>
+                        <li><a href="#">AI Content Detector</a></li>
+                        <li><a href="#">API</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </nav>
+                <div class="nav-right">
+                    <button class="theme-toggle" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1>Advanced AI Content Detection</h1>
+                <p>Detect AI-generated content with precision. Our multi-model detection system identifies text created by ChatGPT, GPT-4, Claude, and other large language models.</p>
+            </section>
+
+            <div class="detector-card">
+                <div class="input-container">
+                    <textarea id="content-input" placeholder="Paste your text here to analyze (minimum 100 characters recommended for accurate results)..."></textarea>
+                    <div class="word-count"><span id="word-count">0</span> words</div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary
