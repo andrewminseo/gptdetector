@@ -3,29 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NotePad</title>
+    <title>Notepad</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #4361ee;
             --secondary: #7209b7;
-            --light-bg: #f5f5f5;
-            --light-text: #333333;
-            --dark-bg: #1e1e1e;
-            --dark-text: #f0f0f0;
+            --light-bg: #f8f9fa;
+            --light-text: #212529;
+            --dark-bg: #121212;
+            --dark-text: #e9ecef;
             --highlight: #4cc9f0;
             --error: #e63946;
             --warning: #ffb703;
             --success: #2a9d8f;
-            --notepad-bg: #fff9c4;
-            --notepad-dark-bg: #3e3e30;
-            --border-radius: 0px;
+            --border-radius: 8px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
+            --notepad-bg: #ffffeb;
+            --notepad-dark-bg: #1e1e2d;
+            --notepad-line: #e6e6c5;
+            --notepad-line-dark: #2a2a3a;
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
@@ -41,7 +43,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem;
+            padding: 1.5rem;
         }
 
         header {
@@ -49,19 +51,14 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            padding: 0.5rem 1rem;
-            background-color: #2b579a;
-            color: white;
-            border-radius: var(--border-radius);
-        }
-
-        body.dark-mode header {
-            background-color: #1c3e6e;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1rem;
         }
 
         .logo {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -73,54 +70,89 @@
             align-items: center;
         }
 
-        .theme-toggle, .save-btn, .load-btn, .delete-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
+        .btn {
+            background-color: var(--primary);
             color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            gap: 0.5rem;
         }
 
-        .theme-toggle:hover, .save-btn:hover, .load-btn:hover, .delete-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-danger {
+            background-color: var(--error);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--light-text);
+            transition: var(--transition);
+        }
+
+        body.dark-mode .theme-toggle {
+            color: var(--dark-text);
         }
 
         .main-content {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            position: relative;
+            gap: 1.5rem;
+            height: calc(100vh - 150px);
+            min-height: 500px;
         }
 
         .editor-section {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f1f1f1;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        body.dark-mode .toolbar {
+            background-color: #2a2a2a;
         }
 
         .editor-container {
             position: relative;
-            border-radius: var(--border-radius);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
             background-color: var(--notepad-bg);
             box-shadow: var(--box-shadow);
             transition: var(--transition);
-            margin-bottom: 0.5rem;
-            height: calc(100vh - 200px);
-            min-height: 300px;
-            border-left: 1px solid #ddd;
-            border-top: 1px solid #ddd;
-            border-right: 1px solid #bbb;
-            border-bottom: 1px solid #bbb;
+            flex-grow: 1;
+            overflow: hidden;
+            background-image: linear-gradient(var(--notepad-line) 1px, transparent 1px);
+            background-size: 100% 24px;
+            background-position-y: 23px;
         }
 
         body.dark-mode .editor-container {
             background-color: var(--notepad-dark-bg);
-            border-color: #444;
+            background-image: linear-gradient(var(--notepad-line-dark) 1px, transparent 1px);
         }
 
         .editor {
@@ -128,103 +160,96 @@
             height: 100%;
             padding: 1rem;
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 24px;
             border: none;
-            border-radius: var(--border-radius);
             outline: none;
             resize: none;
             background-color: transparent;
             color: var(--light-text);
             transition: var(--transition);
             box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
+            caret-color: var(--primary);
         }
 
         body.dark-mode .editor {
             color: var(--dark-text);
         }
 
-        .counts {
+        .counter-bar {
             display: flex;
             justify-content: space-between;
+            padding: 0.5rem;
+            background-color: #f1f1f1;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
             font-size: 0.875rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-            padding: 0 0.5rem;
+            color: #6c757d;
         }
 
-        body.dark-mode .counts {
-            color: #aaa;
+        body.dark-mode .counter-bar {
+            background-color: #2a2a2a;
         }
 
-        /* Rolling Grammar Toolbar */
-        .grammar-toolbar {
-            position: absolute;
-            right: -300px;
-            top: 0;
+        .grammar-section {
             width: 300px;
-            background-color: white;
-            border-radius: 4px;
-            box-shadow: var(--box-shadow);
-            transition: right 0.3s ease;
-            border: 1px solid #ddd;
-            height: 100%;
             display: flex;
             flex-direction: column;
-            z-index: 10;
+            transition: transform 0.3s ease;
+            transform: translateX(0);
         }
 
-        .grammar-toolbar.open {
-            right: 0;
-        }
-
-        body.dark-mode .grammar-toolbar {
-            background-color: #2a2a2a;
-            border-color: #444;
+        .grammar-section.collapsed {
+            transform: translateX(calc(100% - 40px));
         }
 
         .grammar-toggle {
+            width: 40px;
+            align-self: flex-start;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            padding: 1rem 0.5rem;
+            cursor: pointer;
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            text-align: center;
+            font-weight: 600;
             position: absolute;
-            left: -30px;
             top: 50%;
             transform: translateY(-50%);
+            left: 0;
+            z-index: 2;
+        }
+
+        .grammar-content {
+            flex-grow: 1;
             background-color: white;
-            border: 1px solid #ddd;
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            padding: 0.75rem 0.5rem;
-            cursor: pointer;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
-        body.dark-mode .grammar-toggle {
-            background-color: #2a2a2a;
-            border-color: #444;
-            color: white;
-        }
-
-        .grammar-toggle-icon {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
+        body.dark-mode .grammar-content {
+            background-color: #1e1e1e;
         }
 
         .grammar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 1rem;
+            padding: 1rem;
             border-bottom: 1px solid #eee;
         }
 
         body.dark-mode .grammar-header {
-            border-color: #444;
+            border-bottom-color: #333;
         }
 
         .grammar-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: 600;
         }
 
@@ -232,93 +257,54 @@
             background-color: var(--success);
             color: white;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: 700;
-            font-size: 0.875rem;
         }
 
         .issue-list {
-            overflow-y: auto;
-            flex-grow: 1;
             padding: 0;
             margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
         }
 
         .issue-item {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #eee;
             list-style: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .issue-item:hover {
-            background-color: #f9f9f9;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
         }
 
         body.dark-mode .issue-item {
-            border-color: #444;
-        }
-
-        body.dark-mode .issue-item:hover {
-            background-color: #333;
-        }
-
-        .issue-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
+            background-color: #2a2a2a;
         }
 
         .issue-icon {
             margin-right: 0.75rem;
-            font-size: 0.875rem;
+            font-size: 1rem;
             color: var(--warning);
         }
 
-        .issue-type {
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-
         .issue-text {
+            flex: 1;
             font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-            color: #666;
-        }
-
-        body.dark-mode .issue-text {
-            color: #aaa;
         }
 
         .issue-suggestion {
-            font-size: 0.875rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .issue-suggestion-text {
             font-weight: 500;
-        }
-
-        .apply-suggestion {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 0.25rem 0.5rem;
+            color: var(--primary);
             cursor: pointer;
-            font-size: 0.75rem;
-        }
-
-        .apply-suggestion:hover {
-            background-color: #3651d8;
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
         }
 
         .highlight-container {
@@ -332,10 +318,9 @@
             white-space: pre-wrap;
             overflow: auto;
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 24px;
             color: transparent;
             box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
         }
 
         .gpt-highlight {
@@ -351,19 +336,17 @@
         .popup {
             position: absolute;
             background-color: white;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             padding: 0.75rem 1rem;
             font-size: 0.875rem;
             max-width: 300px;
             z-index: 10;
             display: none;
-            border: 1px solid #ddd;
         }
 
         body.dark-mode .popup {
             background-color: #2a2a2a;
-            border-color: #444;
         }
 
         .popup-title {
@@ -419,14 +402,14 @@
         .gpt-detection-section {
             background-color: white;
             border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             padding: 1rem;
             transition: var(--transition);
-            border: 1px solid #ddd;
+            margin-top: 1rem;
         }
 
         body.dark-mode .gpt-detection-section {
-            background-color: #2a2a2a;
-            border-color: #444;
+            background-color: #1e1e1e;
         }
 
         .gpt-detection-header {
@@ -456,7 +439,7 @@
         }
 
         body.dark-mode .gpt-progress {
-            background-color: #444;
+            background-color: #333;
         }
 
         .gpt-progress-bar {
@@ -470,11 +453,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.75rem;
-            color: #666;
-        }
-
-        body.dark-mode .gpt-info {
-            color: #aaa;
+            color: #6c757d;
         }
 
         .gpt-high {
@@ -489,8 +468,8 @@
             color: var(--success);
         }
 
-        /* Modal styles */
-        .modal-overlay {
+        /* Save/Load Panel Styles */
+        .save-panel {
             position: fixed;
             top: 0;
             left: 0;
@@ -500,207 +479,172 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            display: none;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition);
         }
 
-        .modal {
+        .save-panel.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .save-dialog {
             background-color: white;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 400px;
+            max-width: 90%;
             padding: 1.5rem;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        body.dark-mode .modal {
-            background-color: #2a2a2a;
+        body.dark-mode .save-dialog {
+            background-color: #1e1e1e;
         }
 
-        .modal-header {
+        .save-dialog-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
         }
 
-        .modal-title {
+        body.dark-mode .save-dialog-header {
+            border-bottom-color: #333;
+        }
+
+        .save-dialog-title {
             font-size: 1.25rem;
             font-weight: 600;
         }
 
-        .modal-close {
+        .close-dialog {
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             cursor: pointer;
-            color: #666;
+            color: #6c757d;
         }
 
-        body.dark-mode .modal-close {
-            color: #aaa;
+        .input-group {
+            margin-bottom: 1rem;
         }
 
-        .save-form, .load-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-label {
-            font-size: 0.875rem;
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: 500;
         }
 
-        .form-input {
+        .input-field {
+            width: 100%;
             padding: 0.5rem;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             font-size: 1rem;
+            box-sizing: border-box;
         }
 
-        body.dark-mode .form-input {
-            background-color: #333;
+        body.dark-mode .input-field {
+            background-color: #2a2a2a;
             border-color: #444;
-            color: white;
+            color: var(--dark-text);
         }
 
-        .saved-notes-list {
-            margin: 0;
-            padding: 0;
+        .saved-files {
+            margin-top: 1rem;
             max-height: 300px;
             overflow-y: auto;
         }
 
-        .saved-note-item {
-            list-style: none;
-            padding: 0.75rem;
-            border-bottom: 1px solid #eee;
+        .file-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
         }
 
-        body.dark-mode .saved-note-item {
-            border-color: #444;
+        .file-item:hover {
+            background-color: #e9ecef;
         }
 
-        .saved-note-item:last-child {
-            border-bottom: none;
+        body.dark-mode .file-item {
+            background-color: #2a2a2a;
         }
 
-        .note-info {
-            flex: 1;
+        body.dark-mode .file-item:hover {
+            background-color: #333;
         }
 
-        .note-title {
+        .file-title {
             font-weight: 500;
-            margin-bottom: 0.25rem;
         }
 
-        .note-date {
+        .file-date {
             font-size: 0.75rem;
-            color: #666;
+            color: #6c757d;
         }
 
-        body.dark-mode .note-date {
-            color: #aaa;
-        }
-
-        .note-actions {
+        .file-actions {
             display: flex;
             gap: 0.5rem;
         }
 
-        .load-note-btn, .delete-note-btn {
+        .file-btn {
             background: none;
             border: none;
+            font-size: 1rem;
             cursor: pointer;
-            font-size: 0.875rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            color: #6c757d;
+            transition: var(--transition);
         }
 
-        .load-note-btn {
+        .file-btn:hover {
             color: var(--primary);
         }
 
-        .load-note-btn:hover {
-            background-color: rgba(67, 97, 238, 0.1);
-        }
-
-        .delete-note-btn {
+        .delete-btn:hover {
             color: var(--error);
         }
 
-        .delete-note-btn:hover {
-            background-color: rgba(230, 57, 70, 0.1);
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #3651d8;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .no-saved-notes {
-            text-align: center;
-            padding: 1rem;
-            color: #666;
-        }
-
-        body.dark-mode .no-saved-notes {
-            color: #aaa;
-        }
-
         @media (max-width: 900px) {
-            .grammar-toolbar {
-                width: 260px;
+            .main-content {
+                flex-direction: column;
+                height: auto;
             }
-        }
-
-        @media (max-width: 600px) {
-            .grammar-toolbar {
+            
+            .grammar-section {
                 width: 100%;
-                right: -100%;
+                margin-top: 1rem;
+            }
+
+            .grammar-section.collapsed {
+                transform: translateY(calc(100% - 40px));
             }
 
             .grammar-toggle {
-                left: -40px;
+                writing-mode: horizontal-tb;
+                transform: none;
+                width: 100%;
+                height: 40px;
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
+                top: 0;
+                left: 0;
+                transform: none;
+            }
+
+            .editor-container {
+                height: 350px;
             }
         }
     </style>
@@ -709,17 +653,17 @@
     <div class="container">
         <header>
             <div class="logo">
-                <i class="fas fa-sticky-note"></i>
-                <span>NotePad</span>
+                <i class="fas fa-file-alt"></i>
+                <span>Notepad</span>
             </div>
             <div class="header-actions">
-                <button class="save-btn" id="saveBtn">
+                <button id="saveBtn" class="btn">
                     <i class="fas fa-save"></i>
-                    <span>Save</span>
+                    Save
                 </button>
-                <button class="load-btn" id="loadBtn">
+                <button id="loadBtn" class="btn btn-secondary">
                     <i class="fas fa-folder-open"></i>
-                    <span>Load</span>
+                    Load
                 </button>
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon"></i>
@@ -729,6 +673,10 @@
 
         <div class="main-content">
             <div class="editor-section">
+                <div class="toolbar">
+                    <div>File</div>
+                    <div>Edit</div>
+                </div>
                 <div class="editor-container">
                     <textarea id="editor" class="editor" placeholder="Type or paste your text here..."></textarea>
                     <div class="highlight-container" id="highlightContainer"></div>
@@ -736,24 +684,23 @@
                         <div class="spinner"></div>
                     </div>
                 </div>
-                <div class="counts">
-                    <div>Words: <span id="wordCount">0</span></div>
-                    <div>Characters: <span id="charCount">0</span></div>
+                <div class="counter-bar">
+                    <div id="wordCount">Words: 0</div>
+                    <div id="charCount">Characters: 0</div>
                 </div>
             </div>
 
-            <!-- Rolling Grammar Toolbar -->
-            <div class="grammar-toolbar" id="grammarToolbar">
-                <div class="grammar-toggle" id="grammarToggle">
-                    <i class="fas fa-spell-check grammar-toggle-icon"></i>
-                    <div class="grammar-score" id="grammarScore">100</div>
+            <div class="grammar-section" id="grammarSection">
+                <button class="grammar-toggle" id="grammarToggle">Grammar</button>
+                <div class="grammar-content">
+                    <div class="grammar-header">
+                        <div class="grammar-title">Grammar</div>
+                        <div class="grammar-score" id="grammarScore">100</div>
+                    </div>
+                    <ul class="issue-list" id="issueList">
+                        <!-- Grammar issues will be listed here -->
+                    </ul>
                 </div>
-                <div class="grammar-header">
-                    <div class="grammar-title">Grammar & Style</div>
-                </div>
-                <ul class="issue-list" id="issueList">
-                    <!-- Grammar issues will be listed here -->
-                </ul>
             </div>
         </div>
 
@@ -779,49 +726,58 @@
                 This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
             </div>
         </div>
-    </div>
 
-    <!-- Save Modal -->
-    <div class="modal-overlay" id="saveModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Save Note</div>
-                <button class="modal-close" id="closeSaveModal">&times;</button>
-            </div>
-            <form class="save-form" id="saveForm">
-                <div class="form-group">
-                    <label for="noteTitle" class="form-label">Note Title</label>
-                    <input type="text" id="noteTitle" class="form-input" placeholder="Enter a title for your note" required>
+        <!-- Save/Load Panel -->
+        <div class="save-panel" id="savePanel">
+            <div class="save-dialog">
+                <div class="save-dialog-header">
+                    <div class="save-dialog-title" id="dialogTitle">Save Note</div>
+                    <button class="close-dialog" id="closeDialog">×</button>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelSave">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                <div id="saveForm">
+                    <div class="input-group">
+                        <label for="noteName" class="input-label">Note Name</label>
+                        <input type="text" id="noteName" class="input-field" placeholder="Enter a name for your note">
+                    </div>
+                    <button id="saveNoteBtn" class="btn">Save Note</button>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Load Modal -->
-    <div class="modal-overlay" id="loadModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Saved Notes</div>
-                <button class="modal-close" id="closeLoadModal">&times;</button>
-            </div>
-            <ul class="saved-notes-list" id="savedNotesList">
-                <!-- Saved notes will be listed here -->
-            </ul>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" id="cancelLoad">Close</button>
+                <div id="loadForm" style="display: none;">
+                    <div class="saved-files" id="savedFiles">
+                        <!-- Saved files will be listed here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // DOM Elements
+        // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
         const toggleIcon = themeToggle.querySelector('i');
+
+        // Theme toggle without localStorage
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+            } else {
+                toggleIcon.classList.remove('fa-sun');
+                toggleIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Grammar panel toggle
+        const grammarToggle = document.getElementById('grammarToggle');
+        const grammarSection = document.getElementById('grammarSection');
+
+        grammarToggle.addEventListener('click', () => {
+            grammarSection.classList.toggle('collapsed');
+        });
+
+        // Text editor functionality
         const editor = document.getElementById('editor');
         const highlightContainer = document.getElementById('highlightContainer');
         const gptScore = document.getElementById('gptScore');
@@ -832,76 +788,6 @@
         const issueList = document.getElementById('issueList');
         const popup = document.getElementById('popup');
         const loading = document.getElementById('loading');
-        const grammarToolbar = document.getElementById('grammarToolbar');
-        const grammarToggle = document.getElementById('grammarToggle');
-        
-        // Save/Load elements
-        const saveBtn = document.getElementById('saveBtn');
-        const loadBtn = document.getElementById('loadBtn');
-        const saveModal = document.getElementById('saveModal');
-        const loadModal = document.getElementById('loadModal');
-        const closeSaveModal = document.getElementById('closeSaveModal');
-        const closeLoadModal = document.getElementById('closeLoadModal');
-        const cancelSave = document.getElementById('cancelSave');
-        const cancelLoad = document.getElementById('cancelLoad');
-        const saveForm = document.getElementById('saveForm');
-        const noteTitle = document.getElementById('noteTitle');
-        const savedNotesList = document.getElementById('savedNotesList');
-
-        // Grammar toolbar toggle
-        grammarToggle.addEventListener('click', () => {
-            grammarToolbar.classList.toggle('open');
-        });
-
-        // Theme toggle functionality
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            
-            if (body.classList.contains('dark-mode')) {
-                toggleIcon.classList.remove('fa-moon');
-                toggleIcon.classList.add('fa-sun');
-                try {
-                    document.cookie = "theme=dark; path=/; max-age=31536000"; // 1 year
-                } catch (e) {
-                    console.error("Could not set theme cookie:", e);
-                }
-            } else {
-                toggleIcon.classList.remove('fa-sun');
-                toggleIcon.classList.add('fa-moon');
-                try {
-                    document.cookie = "theme=light; path=/; max-age=31536000";
-                } catch (e) {
-                    console.error("Could not set theme cookie:", e);
-                }
-            }
-        });
-
-        // Check for saved theme in cookies
-        function getCookie(name) {
-            try {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop().split(';').shift();
-                return null;
-            } catch (e) {
-                console.error("Error reading cookie:", e);
-                return null;
-            }
-        }
-
-        try {
-            const savedTheme = getCookie('theme');
-            if (savedTheme === 'dark') {
-                body.classList.add('dark-mode');
-                toggleIcon.classList.remove('fa-moon');
-                toggleIcon.classList.add('fa-sun');
-            }
-        } catch (e) {
-            console.error("Error reading theme cookie:", e);
-        }
-
-        // Set initial height to match textarea
-        highlightContainer.style.height = `${editor.offsetHeight}px`;
 
         let typingTimer;
         const typingInterval = 500; // Wait time after typing stops
@@ -909,7 +795,7 @@
         editor.addEventListener('input', () => {
             clearTimeout(typingTimer);
             
-            // Update word count and character count immediately
+            // Update word and character counts immediately
             updateCounts();
             
             // Show loading state
@@ -921,7 +807,7 @@
             }, typingInterval);
         });
 
-        // Ensure highlight container scrolls with textarea
+        // Sync scrolling between editor and highlight container
         editor.addEventListener('scroll', () => {
             highlightContainer.scrollTop = editor.scrollTop;
             highlightContainer.scrollLeft = editor.scrollLeft;
@@ -940,11 +826,11 @@
 
         function updateCounts() {
             const text = editor.value;
-            // Word count
             const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            wordCount.textContent = words;
-            // Character count
-            charCount.textContent = text.length;
+            const chars = text.length;
+            
+            wordCount.textContent = `Words: ${words}`;
+            charCount.textContent = `Characters: ${chars}`;
         }
 
         function analyzeText() {
@@ -978,11 +864,6 @@
                 // Update issue list
                 updateIssueList(grammarIssues);
                 
-                // Open grammar toolbar if there are issues
-                if (grammarIssues.length > 0) {
-                    grammarToolbar.classList.add('open');
-                }
-                
                 // Hide loading state
                 loading.style.display = 'none';
             }, 600);
@@ -993,4 +874,101 @@
             gptProgressBar.style.width = `${score}%`;
             
             // Set color based on score
-            g
+            gptScore.className = '';
+            if (score >= 70) {
+                gptScore.classList.add('gpt-high');
+            } else if (score >= 40) {
+                gptScore.classList.add('gpt-medium');
+            } else {
+                gptScore.classList.add('gpt-low');
+            }
+        }
+
+        function updateGrammarScore(score) {
+            grammarScore.textContent = score;
+            
+            // Set color based on score
+            if (score >= 90) {
+                grammarScore.style.backgroundColor = 'var(--success)';
+            } else if (score >= 70) {
+                grammarScore.style.backgroundColor = 'var(--warning)';
+            } else {
+                grammarScore.style.backgroundColor = 'var(--error)';
+            }
+        }
+
+        function simulateGptDetection(text) {
+            // This is a simplified simulation of GPT detection
+            // In a real implementation, this would be an API call
+            
+            // List of patterns that are more common in AI-generated text
+            const aiPatterns = [
+                /furthermore/i,
+                /moreover/i,
+                /additionally/i,
+                /however,/i,
+                /nevertheless/i,
+                /consequently/i,
+                /in conclusion/i,
+                /to summarize/i,
+                /as a result/i,
+                /in essence/i,
+                /it is worth noting that/i,
+                /it is important to consider/i,
+                /it goes without saying/i,
+                /it should be emphasized that/i
+            ];
+            
+            // Check for patterns
+            let matchCount = 0;
+            aiPatterns.forEach(pattern => {
+                if (pattern.test(text)) {
+                    matchCount++;
+                }
+            });
+            
+            // Check for sentence variety
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const sentenceLengths = sentences.map(s => s.trim().split(/\s+/).length);
+            const sentenceVariety = calculateStandardDeviation(sentenceLengths);
+            
+            // Low standard deviation suggests uniform sentence length (more likely AI)
+            const varietyFactor = Math.min(sentenceVariety * 5, 20);
+            
+            // Calculate GPT score based on patterns and variety
+            const patternScore = (matchCount / aiPatterns.length) * 70;
+            const varietyScore = (1 - (varietyFactor / 20)) * 30;
+            const calculatedScore = Math.min(Math.round(patternScore + varietyScore), 99);
+            
+            // Add randomness for demo purposes
+            return Math.min(Math.max(calculatedScore + (Math.random() * 10 - 5), 1), 99);
+        }
+
+        function calculateStandardDeviation(values) {
+            if (values.length <= 1) return 0;
+            
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+            const squareDiffs = values.map(val => Math.pow(val - mean, 2));
+            const variance = squareDiffs.reduce((sum, val) => sum + val, 0) / values.length;
+            
+            return Math.sqrt(variance);
+        }
+
+        function checkGrammar(text) {
+            // Simplified grammar checking
+            // In a real implementation, this would use a grammar checking API
+            
+            const issues = [];
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            
+            // Common issues to check for
+            const grammarPatterns = [
+                { pattern: /\b(their|they're|there)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(your|you're)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(its|it's)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(affect|effect)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(then|than)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(to|too|two)\b/gi, type: 'commonly confused words' },
+                { pattern: /\s[,.!?]|\s+$/g, type: 'punctuation spacing' },
+                { pattern: /\b(\w+)\s+\1\b/gi, type: 'repeated word' },
+                { pattern: /\b(alot|definately|seperate|recieve|accomodate)\b/gi, type: 'spelling' }
