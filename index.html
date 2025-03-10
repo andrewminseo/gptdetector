@@ -566,4 +566,161 @@
         }
 
         function checkGrammar(text) {
-            // Simplifie
+            // Simplified grammar checking
+            // In a real implementation, this would use a grammar checking API
+            
+            const issues = [];
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            
+            // Common issues to check for
+            const grammarPatterns = [
+                { pattern: /\b(their|they're|there)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(your|you're)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(its|it's)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(affect|effect)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(then|than)\b/gi, type: 'commonly confused words' },
+                { pattern: /\b(to|too|two)\b/gi, type: 'commonly confused words' },
+                { pattern: /\s[,.!?]|\s+$/g, type: 'punctuation spacing' },
+                { pattern: /\b(\w+)\s+\1\b/gi, type: 'repeated word' },
+                { pattern: /\b(alot|definately|seperate|recieve|accomodate)\b/gi, type: 'spelling' }
+            ];
+            
+            // Check for sentence capitalization
+            sentences.forEach((sentence, index) => {
+                const trimmedSentence = sentence.trim();
+                if (trimmedSentence.length > 0 && trimmedSentence[0] !== trimmedSentence[0].toUpperCase()) {
+                    const position = text.indexOf(trimmedSentence);
+                    if (position !== -1) {
+                        issues.push({
+                            index: position,
+                            length: 1,
+                            text: trimmedSentence.substring(0, 1),
+                            suggestion: trimmedSentence[0].toUpperCase(),
+                            message: 'Sentence should start with a capital letter'
+                        });
+                    }
+                }
+            });
+            
+            // Check for other grammar issues
+            grammarPatterns.forEach(({ pattern, type }) => {
+                let match;
+                while ((match = pattern.exec(text)) !== null) {
+                    // Skip patterns that are part of a URL
+                    const isInUrl = /https?:\/\/\S+/.test(text.substring(Math.max(0, match.index - 8), match.index + match[0].length + 8));
+                    if (!isInUrl) {
+                        issues.push({
+                            index: match.index,
+                            length: match[0].length,
+                            text: match[0],
+                            type: type,
+                            message: `Possible ${type} issue: "${match[0]}"`
+                        });
+                    }
+                }
+            });
+            
+            return issues;
+        }
+
+        function applyHighlights(text, gptPercentage, grammarIssues) {
+            // Create HTML with highlights
+            let html = escapeHtml(text);
+            
+            // Add grammar issue highlights
+            const fragments = [];
+            let lastIndex = 0;
+            
+            // Sort issues by index
+            grammarIssues.sort((a, b) => a.index - b.index);
+            
+            grammarIssues.forEach(issue => {
+                fragments.push(html.substring(lastIndex, issue.index));
+                fragments.push(`<span class="grammar-highlight" data-message="${escapeHtml(issue.message)}">`);
+                fragments.push(html.substring(issue.index, issue.index + issue.length));
+                fragments.push('</span>');
+                lastIndex = issue.index + issue.length;
+            });
+            
+            fragments.push(html.substring(lastIndex));
+            html = fragments.join('');
+            
+            // Add GPT detection highlights for high-probability sections
+            if (gptPercentage > 40) {
+                // Highlight some paragraphs (this is just a simple simulation)
+                const paragraphs = html.split('\n\n');
+                
+                for (let i = 0; i < paragraphs.length; i++) {
+                    // Higher chance of highlighting paragraphs when GPT score is high
+                    const highlightChance = gptPercentage / 100;
+                    
+                    if (paragraphs[i].length > 100 && Math.random() < highlightChance) {
+                        paragraphs[i] = `<span class="gpt-highlight">${paragraphs[i]}</span>`;
+                    }
+                }
+                
+                html = paragraphs.join('\n\n');
+            }
+            
+            // Apply the HTML to the highlight container
+            highlightContainer.innerHTML = html;
+        }
+
+        function updateIssueList(grammarIssues) {
+            issueList.innerHTML = '';
+            
+            if (grammarIssues.length === 0) {
+                const noIssues = document.createElement('li');
+                noIssues.className = 'issue-item';
+                noIssues.innerHTML = `
+                    <i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i>
+                    <span class="issue-text">No grammar issues found!</span>
+                `;
+                issueList.appendChild(noIssues);
+                return;
+            }
+            
+            grammarIssues.forEach(issue => {
+                const issueItem = document.createElement('li');
+                issueItem.className = 'issue-item';
+                
+                let suggestionHtml = '';
+                if (issue.suggestion) {
+                    suggestionHtml = `<span class="issue-suggestion">Replace with: "${issue.suggestion}"</span>`;
+                }
+                
+                issueItem.innerHTML = `
+                    <i class="fas fa-exclamation-triangle issue-icon"></i>
+                    <span class="issue-text">${issue.message}</span>
+                    ${suggestionHtml}
+                `;
+                
+                issueList.appendChild(issueItem);
+            });
+        }
+
+        function showPopup(target) {
+            const rect = target.getBoundingClientRect();
+            const editorContainerRect = document.querySelector('.editor-container').getBoundingClientRect();
+            
+            popup.style.top = `${rect.bottom - editorContainerRect.top + 10}px`;
+            popup.style.left = `${rect.left - editorContainerRect.left}px`;
+            popup.classList.add('visible');
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Initialize with sample text for demo
+        editor.value = "This text will be analyzed for AI content and grammar issues. Type or paste your own text to see real-time analysis.\n\nThe detector highlights sections that may have been generated by AI models such as GPT. It also checks for common grammar mistakes and gives you suggestions to improve your writing.";
+        updateWordCount();
+        analyzeText();
+    </script>
+</body>
+</html>
