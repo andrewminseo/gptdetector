@@ -3,38 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad</title>
+    <title>NotePad</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #3a86ff;
-            --secondary: #00b4d8;
-            --light-bg: #f8f9fa;
-            --light-text: #212529;
-            --dark-bg: #121212;
-            --dark-text: #e9ecef;
-            --highlight: #0077b6;
+            --primary: #4361ee;
+            --secondary: #7209b7;
+            --light-bg: #f5f5f5;
+            --light-text: #333333;
+            --dark-bg: #1e1e1e;
+            --dark-text: #f0f0f0;
+            --highlight: #4cc9f0;
             --error: #e63946;
             --warning: #ffb703;
             --success: #2a9d8f;
-            --border-radius: 8px;
+            --notepad-bg: #fff9c4;
+            --notepad-dark-bg: #3e3e30;
+            --border-radius: 0px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
-            --blue-light-bg: #ebf5ff;
-            --blue-light-text: #0a2540;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
             color: var(--light-text);
             transition: var(--transition);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
         }
 
         body.dark-mode {
@@ -42,215 +38,89 @@
             color: var(--dark-text);
         }
 
-        body.blue-light-mode {
-            background-color: var(--blue-light-bg);
-            color: var(--blue-light-text);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
         }
 
-        .top-bar {
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 1.5rem;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            z-index: 10;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #2b579a;
+            color: white;
+            border-radius: var(--border-radius);
         }
 
-        body.dark-mode .top-bar {
-            background-color: #1e1e1e;
-            border-bottom: 1px solid #333;
-        }
-
-        body.blue-light-mode .top-bar {
-            background-color: #d6e8ff;
-            border-bottom: 1px solid #b8d4ff;
+        body.dark-mode header {
+            background-color: #1c3e6e;
         }
 
         .logo {
             font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary);
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        body.dark-mode .logo {
-            color: #4c9eff;
-        }
-
-        body.blue-light-mode .logo {
-            color: #0055cc;
-        }
-
-        .controls {
+        .header-actions {
             display: flex;
-            align-items: center;
             gap: 1rem;
+            align-items: center;
         }
 
-        .theme-menu {
-            position: relative;
-            display: inline-block;
-        }
-
-        .theme-button {
+        .theme-toggle, .save-btn, .load-btn, .delete-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.1rem;
-            color: var(--light-text);
-            padding: 0.5rem;
-            border-radius: 4px;
+            font-size: 1rem;
+            color: white;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
         }
 
-        .theme-button:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .theme-button {
-            color: var(--dark-text);
-        }
-
-        body.dark-mode .theme-button:hover {
+        .theme-toggle:hover, .save-btn:hover, .load-btn:hover, .delete-btn:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        body.blue-light-mode .theme-button {
-            color: var(--blue-light-text);
-        }
-
-        body.blue-light-mode .theme-button:hover {
-            background-color: rgba(0, 85, 204, 0.1);
-        }
-
-        .theme-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            z-index: 100;
-            min-width: 160px;
-            overflow: hidden;
-        }
-
-        body.dark-mode .theme-dropdown {
-            background-color: #2a2a2a;
-            border: 1px solid #444;
-        }
-
-        body.blue-light-mode .theme-dropdown {
-            background-color: #f0f7ff;
-            border: 1px solid #c4dbff;
-        }
-
-        .theme-dropdown.show {
-            display: block;
-        }
-
-        .theme-option {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            transition: var(--transition);
+        .main-content {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .theme-option:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .theme-option:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        body.blue-light-mode .theme-option:hover {
-            background-color: rgba(0, 85, 204, 0.05);
-        }
-
-        .theme-option i {
-            width: 20px;
-            text-align: center;
-        }
-
-        .save-button, .files-button {
-            background: none;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            color: var(--light-text);
-        }
-
-        .save-button:hover, .files-button:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .save-button, 
-        body.dark-mode .files-button {
-            border-color: #444;
-            color: var(--dark-text);
-        }
-
-        body.dark-mode .save-button:hover, 
-        body.dark-mode .files-button:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        body.blue-light-mode .save-button, 
-        body.blue-light-mode .files-button {
-            border-color: #b8d4ff;
-            color: var(--blue-light-text);
-        }
-
-        body.blue-light-mode .save-button:hover, 
-        body.blue-light-mode .files-button:hover {
-            background-color: rgba(0, 85, 204, 0.05);
-        }
-
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
         }
 
         .editor-section {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-            position: relative;
-            overflow: hidden;
+            min-width: 0;
         }
 
         .editor-container {
-            flex: 1;
             position: relative;
             border-radius: var(--border-radius);
-            background-color: white;
+            background-color: var(--notepad-bg);
             box-shadow: var(--box-shadow);
-            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 0.5rem;
+            height: calc(100vh - 200px);
+            min-height: 300px;
+            border-left: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            border-right: 1px solid #bbb;
+            border-bottom: 1px solid #bbb;
         }
 
         body.dark-mode .editor-container {
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-        }
-
-        body.blue-light-mode .editor-container {
-            background-color: white;
-            border: 1px solid #d6e8ff;
+            background-color: var(--notepad-dark-bg);
+            border-color: #444;
         }
 
         .editor {
@@ -260,20 +130,195 @@
             font-size: 1rem;
             line-height: 1.5;
             border: none;
+            border-radius: var(--border-radius);
             outline: none;
             resize: none;
             background-color: transparent;
             color: var(--light-text);
             transition: var(--transition);
             box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         body.dark-mode .editor {
             color: var(--dark-text);
         }
 
-        body.blue-light-mode .editor {
-            color: var(--blue-light-text);
+        .counts {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        body.dark-mode .counts {
+            color: #aaa;
+        }
+
+        /* Rolling Grammar Toolbar */
+        .grammar-toolbar {
+            position: absolute;
+            right: -300px;
+            top: 0;
+            width: 300px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: var(--box-shadow);
+            transition: right 0.3s ease;
+            border: 1px solid #ddd;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .grammar-toolbar.open {
+            right: 0;
+        }
+
+        body.dark-mode .grammar-toolbar {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+
+        .grammar-toggle {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: white;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            padding: 0.75rem 0.5rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .grammar-toggle {
+            background-color: #2a2a2a;
+            border-color: #444;
+            color: white;
+        }
+
+        .grammar-toggle-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .grammar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .grammar-header {
+            border-color: #444;
+        }
+
+        .grammar-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .grammar-score {
+            background-color: var(--success);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .issue-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 0;
+            margin: 0;
+        }
+
+        .issue-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            list-style: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .issue-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        body.dark-mode .issue-item {
+            border-color: #444;
+        }
+
+        body.dark-mode .issue-item:hover {
+            background-color: #333;
+        }
+
+        .issue-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .issue-icon {
+            margin-right: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--warning);
+        }
+
+        .issue-type {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .issue-text {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        body.dark-mode .issue-text {
+            color: #aaa;
+        }
+
+        .issue-suggestion {
+            font-size: 0.875rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .issue-suggestion-text {
+            font-weight: 500;
+        }
+
+        .apply-suggestion {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .apply-suggestion:hover {
+            background-color: #3651d8;
         }
 
         .highlight-container {
@@ -285,11 +330,12 @@
             pointer-events: none;
             padding: 1rem;
             white-space: pre-wrap;
-            overflow: hidden;
+            overflow: auto;
             font-size: 1rem;
             line-height: 1.5;
             color: transparent;
             box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .gpt-highlight {
@@ -302,198 +348,22 @@
             border-bottom: 2px solid var(--warning);
         }
 
-        .grammar-section {
-            width: 320px;
-            background-color: white;
-            border-left: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-            transition: var(--transition);
-        }
-
-        body.dark-mode .grammar-section {
-            background-color: #1e1e1e;
-            border-left: 1px solid #333;
-        }
-
-        body.blue-light-mode .grammar-section {
-            background-color: #f0f7ff;
-            border-left: 1px solid #d6e8ff;
-        }
-
-        .grammar-header {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        body.dark-mode .grammar-header {
-            border-bottom: 1px solid #333;
-        }
-
-        body.blue-light-mode .grammar-header {
-            border-bottom: 1px solid #d6e8ff;
-        }
-
-        .grammar-title {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .grammar-score {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .score-circle {
-            width: 30px;
-            height: 30px;
-            position: relative;
-        }
-
-        .score-value {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .grammar-issues {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0.5rem;
-        }
-
-        .issue-card {
-            margin-bottom: 0.75rem;
-            border-radius: var(--border-radius);
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        body.dark-mode .issue-card {
-            background-color: #2a2a2a;
-        }
-
-        body.blue-light-mode .issue-card {
-            background-color: white;
-            border: 1px solid #e8f2ff;
-        }
-
-        .issue-header {
-            padding: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        body.dark-mode .issue-header {
-            border-bottom: 1px solid #333;
-        }
-
-        body.blue-light-mode .issue-header {
-            border-bottom: 1px solid #e8f2ff;
-        }
-
-        .issue-icon {
-            color: var(--warning);
-            font-size: 1rem;
-        }
-
-        .issue-title {
-            font-weight: 500;
-            font-size: 0.875rem;
-            flex: 1;
-        }
-
-        .issue-content {
-            padding: 0.75rem;
-            font-size: 0.875rem;
-        }
-
-        .issue-suggestion {
-            margin-top: 0.5rem;
-            color: var(--primary);
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        body.dark-mode .issue-suggestion {
-            color: #4c9eff;
-        }
-
-        body.blue-light-mode .issue-suggestion {
-            color: #0055cc;
-        }
-
-        .gpt-detection {
-            padding: 0.75rem 1rem;
-            background-color: #f8f9fa;
-            border-top: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        body.dark-mode .gpt-detection {
-            background-color: #252525;
-            border-top: 1px solid #333;
-        }
-
-        body.blue-light-mode .gpt-detection {
-            background-color: #e8f2ff;
-            border-top: 1px solid #d6e8ff;
-        }
-
-        .gpt-title {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .gpt-score {
-            font-weight: 600;
-        }
-
-        .gpt-high {
-            color: var(--error);
-        }
-
-        .gpt-medium {
-            color: var(--warning);
-        }
-
-        .gpt-low {
-            color: var(--success);
-        }
-
         .popup {
             position: absolute;
             background-color: white;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             padding: 0.75rem 1rem;
             font-size: 0.875rem;
             max-width: 300px;
             z-index: 10;
             display: none;
+            border: 1px solid #ddd;
         }
 
         body.dark-mode .popup {
             background-color: #2a2a2a;
-            border: 1px solid #444;
-        }
-
-        body.blue-light-mode .popup {
-            background-color: white;
-            border: 1px solid #d6e8ff;
+            border-color: #444;
         }
 
         .popup-title {
@@ -528,10 +398,6 @@
             background-color: rgba(30, 30, 30, 0.8);
         }
 
-        body.blue-light-mode .loading {
-            background-color: rgba(240, 247, 255, 0.8);
-        }
-
         .spinner {
             width: 40px;
             height: 40px;
@@ -546,533 +412,585 @@
             border-top-color: var(--primary);
         }
 
-        body.blue-light-mode .spinner {
-            border-color: rgba(0, 85, 204, 0.1);
-            border-top-color: var(--primary);
-        }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Save dialog */
-        .modal {
-            display: none;
+        .gpt-detection-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            transition: var(--transition);
+            border: 1px solid #ddd;
+        }
+
+        body.dark-mode .gpt-detection-section {
+            background-color: #2a2a2a;
+            border-color: #444;
+        }
+
+        .gpt-detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .gpt-detection-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .gpt-score-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .gpt-progress {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark-mode .gpt-progress {
+            background-color: #444;
+        }
+
+        .gpt-progress-bar {
+            height: 100%;
+            background-color: var(--error);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .gpt-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        body.dark-mode .gpt-info {
+            color: #aaa;
+        }
+
+        .gpt-high {
+            color: var(--error);
+        }
+
+        .gpt-medium {
+            color: var(--warning);
+        }
+
+        .gpt-low {
+            color: var(--success);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 1000;
+            display: none;
         }
 
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
+        .modal {
             background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            width: 400px;
-            max-width: 90%;
-            overflow: hidden;
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        body.dark-mode .modal-content {
+        body.dark-mode .modal {
             background-color: #2a2a2a;
-            border: 1px solid #444;
-        }
-
-        body.blue-light-mode .modal-content {
-            background-color: white;
-            border: 1px solid #d6e8ff;
         }
 
         .modal-header {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        body.dark-mode .modal-header {
-            border-bottom: 1px solid #444;
-        }
-
-        body.blue-light-mode .modal-header {
-            border-bottom: 1px solid #e8f2ff;
+            margin-bottom: 1rem;
         }
 
         .modal-title {
+            font-size: 1.25rem;
             font-weight: 600;
-            font-size: 1.1rem;
         }
 
         .modal-close {
             background: none;
             border: none;
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 1.2rem;
-            color: #888;
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            color: #555;
+            color: #666;
         }
 
         body.dark-mode .modal-close {
             color: #aaa;
         }
 
-        body.dark-mode .modal-close:hover {
-            color: #ddd;
+        .save-form, .load-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .modal-body {
-            padding: 1rem;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 0.5rem;
+        .form-label {
             font-size: 0.875rem;
             font-weight: 500;
         }
 
-        .text-input {
-            width: 100%;
+        .form-input {
             padding: 0.5rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
-            box-sizing: border-box;
         }
 
-        body.dark-mode .text-input {
+        body.dark-mode .form-input {
             background-color: #333;
             border-color: #444;
-            color: #ddd;
-        }
-
-        body.blue-light-mode .text-input {
-            border-color: #d6e8ff;
-        }
-
-        .text-input:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-
-        .modal-footer {
-            padding: 1rem;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        body.dark-mode .modal-footer {
-            border-top: 1px solid #444;
-        }
-
-        body.blue-light-mode .modal-footer {
-            border-top: 1px solid #e8f2ff;
-        }
-
-        .modal-button {
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .cancel-button {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            color: #333;
-        }
-
-        .cancel-button:hover {
-            background-color: #e9ecef;
-        }
-
-        body.dark-mode .cancel-button {
-            background-color: #333;
-            border-color: #444;
-            color: #ddd;
-        }
-
-        body.dark-mode .cancel-button:hover {
-            background-color: #444;
-        }
-
-        body.blue-light-mode .cancel-button {
-            background-color: #f0f7ff;
-            border-color: #d6e8ff;
-            color: #0055cc;
-        }
-
-        body.blue-light-mode .cancel-button:hover {
-            background-color: #e8f2ff;
-        }
-
-        .save-confirm-button {
-            background-color: var(--primary);
-            border: 1px solid var(--primary);
             color: white;
         }
 
-        .save-confirm-button:hover {
-            background-color: #0069d9;
-            border-color: #0062cc;
-        }
-
-        body.dark-mode .save-confirm-button {
-            background-color: #4c9eff;
-            border-color: #4c9eff;
-        }
-
-        body.dark-mode .save-confirm-button:hover {
-            background-color: #2388ff;
-            border-color: #2388ff;
-        }
-
-        body.blue-light-mode .save-confirm-button {
-            background-color: #0055cc;
-            border-color: #0055cc;
-        }
-
-        body.blue-light-mode .save-confirm-button:hover {
-            background-color: #004099;
-            border-color: #004099;
-        }
-
-        /* Files modal */
-        .files-list {
+        .saved-notes-list {
+            margin: 0;
+            padding: 0;
             max-height: 300px;
             overflow-y: auto;
         }
 
-        .file-item {
+        .saved-note-item {
+            list-style: none;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem;
-            border-bottom: 1px solid #eee;
-            transition: var(--transition);
         }
 
-        .file-item:last-child {
+        body.dark-mode .saved-note-item {
+            border-color: #444;
+        }
+
+        .saved-note-item:last-child {
             border-bottom: none;
         }
 
-        .file-item:hover {
-            background-color: #f8f9fa;
+        .note-info {
+            flex: 1;
         }
 
-        body.dark-mode .file-item {
-            border-bottom: 1px solid #333;
-        }
-
-        body.dark-mode .file-item:hover {
-            background-color: #333;
-        }
-
-        body.blue-light-mode .file-item {
-            border-bottom: 1px solid #e8f2ff;
-        }
-
-        body.blue-light-mode .file-item:hover {
-            background-color: #f0f7ff;
-        }
-
-        .file-name {
+        .note-title {
             font-weight: 500;
-            cursor: pointer;
+            margin-bottom: 0.25rem;
         }
 
-        .file-actions {
+        .note-date {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        body.dark-mode .note-date {
+            color: #aaa;
+        }
+
+        .note-actions {
             display: flex;
             gap: 0.5rem;
         }
 
-        .file-action {
+        .load-note-btn, .delete-note-btn {
             background: none;
             border: none;
             cursor: pointer;
-            color: #6c757d;
             font-size: 0.875rem;
-            padding: 0.25rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 4px;
-            transition: var(--transition);
         }
 
-        .file-action:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-            color: #343a40;
+        .load-note-btn {
+            color: var(--primary);
         }
 
-        body.dark-mode .file-action {
-            color: #aaa;
+        .load-note-btn:hover {
+            background-color: rgba(67, 97, 238, 0.1);
         }
 
-        body.dark-mode .file-action:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ddd;
+        .delete-note-btn {
+            color: var(--error);
         }
 
-        body.blue-light-mode .file-action:hover {
-            background-color: rgba(0, 85, 204, 0.05);
-            color: #0055cc;
+        .delete-note-btn:hover {
+            background-color: rgba(230, 57, 70, 0.1);
         }
 
-        .no-files {
-            padding: 1.5rem;
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3651d8;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .no-saved-notes {
             text-align: center;
-            color: #6c757d;
+            padding: 1rem;
+            color: #666;
         }
 
-        body.dark-mode .no-files {
+        body.dark-mode .no-saved-notes {
             color: #aaa;
         }
 
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
+        @media (max-width: 900px) {
+            .grammar-toolbar {
+                width: 260px;
             }
-            
-            .grammar-section {
+        }
+
+        @media (max-width: 600px) {
+            .grammar-toolbar {
                 width: 100%;
-                border-left: none;
-                border-top: 1px solid #eee;
+                right: -100%;
             }
-            
-            body.dark-mode .grammar-section {
-                border-top: 1px solid #333;
-            }
-            
-            body.blue-light-mode .grammar-section {
-                border-top: 1px solid #d6e8ff;
+
+            .grammar-toggle {
+                left: -40px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="logo">
-            <i class="fas fa-edit"></i>
-            <span>Notepad</span>
-        </div>
-        <div class="controls">
-            <button class="save-button" id="saveButton">
-                <i class="fas fa-save"></i>
-                <span>Save</span>
-            </button>
-            <button class="files-button" id="filesButton">
-                <i class="fas fa-folder-open"></i>
-                <span>Files</span>
-            </button>
-            <div class="theme-menu">
-                <button class="theme-button" id="themeButton">
-                    <i class="fas fa-palette"></i>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-sticky-note"></i>
+                <span>NotePad</span>
+            </div>
+            <div class="header-actions">
+                <button class="save-btn" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                    <span>Save</span>
                 </button>
-                <div class="theme-dropdown" id="themeDropdown">
-                    <div class="theme-option" data-theme="light">
-                        <i class="fas fa-sun"></i>
-                        <span>Light Mode</span>
-                    </div>
-                    <div class="theme-option" data-theme="dark">
-                        <i class="fas fa-moon"></i>
-                        <span>Dark Mode</span>
-                    </div>
-                    <div class="theme-option" data-theme="blue-light">
-                        <i class="fas fa-tint"></i>
-                        <span>Blue Light Mode</span>
+                <button class="load-btn" id="loadBtn">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Load</span>
+                </button>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="editor-section">
+                <div class="editor-container">
+                    <textarea id="editor" class="editor" placeholder="Type or paste your text here..."></textarea>
+                    <div class="highlight-container" id="highlightContainer"></div>
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
                     </div>
                 </div>
+                <div class="counts">
+                    <div>Words: <span id="wordCount">0</span></div>
+                    <div>Characters: <span id="charCount">0</span></div>
+                </div>
+            </div>
+
+            <!-- Rolling Grammar Toolbar -->
+            <div class="grammar-toolbar" id="grammarToolbar">
+                <div class="grammar-toggle" id="grammarToggle">
+                    <i class="fas fa-spell-check grammar-toggle-icon"></i>
+                    <div class="grammar-score" id="grammarScore">100</div>
+                </div>
+                <div class="grammar-header">
+                    <div class="grammar-title">Grammar & Style</div>
+                </div>
+                <ul class="issue-list" id="issueList">
+                    <!-- Grammar issues will be listed here -->
+                </ul>
             </div>
         </div>
-    </div>
 
-    <div class="main-container">
-        <div class="editor-section">
-            <div class="editor-container">
-                <textarea id="editor" class="editor" placeholder="Type or paste your text here..."></textarea>
-                <div class="highlight-container" id="highlightContainer"></div>
-                <div class="loading" id="loading" style="display: none;">
-                    <div class="spinner"></div>
+        <div class="gpt-detection-section">
+            <div class="gpt-detection-header">
+                <div class="gpt-detection-title">AI Content Detection</div>
+                <div class="gpt-score-container">
+                    <div id="gptScore" class="gpt-low">0%</div>
                 </div>
+            </div>
+            <div class="gpt-progress">
+                <div class="gpt-progress-bar" id="gptProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="gpt-info">
+                <span>Human-written</span>
+                <span>AI-generated</span>
             </div>
         </div>
 
-        <div class="grammar-section">
-            <div class="grammar-header">
-                <div class="grammar-title">Grammar</div>
-                <div class="grammar-score">
-                    <div class="score-circle">
-                        <svg width="30" height="30" viewBox="0 0 36 36">
-                            <circle cx="18" cy="18" r="16" fill="none" stroke="#eee" stroke-width="2"></circle>
-                            <circle id="grammarScoreCircle" cx="18" cy="18" r="16" fill="none" stroke="#2a9d8f" stroke-width="2" stroke-dasharray="100 100" stroke-dashoffset="0"></circle>
-                        </svg>
-                        <div class="score-value" id="grammarScoreText">100</div>
-                    </div>
-                </div>
+        <div class="popup" id="popup">
+            <div class="popup-title">AI Content Detected</div>
+            <div class="popup-content">
+                This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
             </div>
-            <div class="grammar-issues" id="grammarIssues">
-                <!-- Grammar issues will be displayed here -->
-                <div class="no-files" id="noIssuesMessage">
-                    No grammar issues found!
-                </div>
-            </div>
-            <div class="gpt-detection">
-                <div class="gpt-title">GPT Detection</div>
-                <div class="gpt-score" id="gptScore">0%</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup" id="popup">
-        <div class="popup-title">AI Content Detected</div>
-        <div class="popup-content">
-            This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
         </div>
     </div>
 
     <!-- Save Modal -->
-    <div class="modal" id="saveModal">
-        <div class="modal-content">
+    <div class="modal-overlay" id="saveModal">
+        <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">Save Note</div>
-                <button class="modal-close" id="saveModalClose">&times;</button>
+                <button class="modal-close" id="closeSaveModal">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="input-group">
-                    <label class="input-label" for="saveFileName">File Name</label>
-                    <input type="text" id="saveFileName" class="text-input" placeholder="Enter a name for your note">
+            <form class="save-form" id="saveForm">
+                <div class="form-group">
+                    <label for="noteTitle" class="form-label">Note Title</label>
+                    <input type="text" id="noteTitle" class="form-input" placeholder="Enter a title for your note" required>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button cancel-button" id="saveCancelButton">Cancel</button>
-                <button class="modal-button save-confirm-button" id="saveConfirmButton">Save</button>
-            </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelSave">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Files Modal -->
-    <div class="modal" id="filesModal">
-        <div class="modal-content">
+    <!-- Load Modal -->
+    <div class="modal-overlay" id="loadModal">
+        <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">Saved Notes</div>
-                <button class="modal-close" id="filesModalClose">&times;</button>
+                <button class="modal-close" id="closeLoadModal">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="files-list" id="filesList">
-                    <!-- Saved files will be listed here -->
-                    <div class="no-files" id="noFilesMessage">
-                        No saved notes found!
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button cancel-button" id="filesCancelButton">Close</button>
+            <ul class="saved-notes-list" id="savedNotesList">
+                <!-- Saved notes will be listed here -->
+            </ul>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancelLoad">Close</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Storage functions - using sessionStorage as a fallback when localStorage is unavailable
-        const storage = {
-            available: (function() {
-                try {
-                    const testKey = '__storage_test__';
-                    localStorage.setItem(testKey, testKey);
-                    localStorage.removeItem(testKey);
-                    return true;
-                } catch(e) {
-                    return false;
-                }
-            })(),
-            
-            getItem: function(key) {
-                if (this.available) {
-                    return localStorage.getItem(key);
-                } else {
-                    return sessionStorage.getItem(key);
-                }
-            },
-            
-            setItem: function(key, value) {
-                if (this.available) {
-                    localStorage.setItem(key, value);
-                } else {
-                    sessionStorage.setItem(key, value);
-                }
-            },
-            
-            removeItem: function(key) {
-                if (this.available) {
-                    localStorage.removeItem(key);
-                } else {
-                    sessionStorage.removeItem(key);
-                }
-            },
-            
-            getAllKeys: function() {
-                const keys = [];
-                if (this.available) {
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key.startsWith('notepad_')) {
-                            keys.push(key);
-                        }
-                    }
-                } else {
-                    for (let i = 0; i < sessionStorage.length; i++) {
-                        const key = sessionStorage.key(i);
-                        if (key.startsWith('notepad_')) {
-                            keys.push(key);
-                        }
-                    }
-                }
-                return keys;
-            }
-        };
-        
         // DOM Elements
-        const themeButton = document.getElementById('themeButton');
-        const themeDropdown = document.getElementById('themeDropdown');
-        const themeOptions = document.querySelectorAll('.theme-option');
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const toggleIcon = themeToggle.querySelector('i');
         const editor = document.getElementById('editor');
         const highlightContainer = document.getElementById('highlightContainer');
         const gptScore = document.getElementById('gptScore');
-        const grammarScoreText = document.getElementById('grammarScoreText');
-        const grammarScoreCircle = document.getElementById('grammarScoreCircle');
-        const grammarIssues = document.getElementById('grammarIssues');
-        const noIssuesMessage = document.getElementById('noIssuesMessage');
+        const gptProgressBar = document.getElementById('gptProgressBar');
+        const grammarScore = document.getElementById('grammarScore');
+        const wordCount = document.getElementById('wordCount');
+        const charCount = document.getElementById('charCount');
+        const issueList = document.getElementById('issueList');
         const popup = document.getElementById('popup');
         const loading = document.getElementById('loading');
+        const grammarToolbar = document.getElementById('grammarToolbar');
+        const grammarToggle = document.getElementById('grammarToggle');
         
-        // Save/Files Modal Elements
-        const saveButton = document.getElementById('saveButton');
-        const filesButton = document.getElementById('filesButton');
+        // Save/Load elements
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
         const saveModal = document.getElementById('saveModal');
-        const saveModalClose = document.getElementById('saveModalClose');
-        const saveCancelButton = document.getElementById('saveCancelButton');
-        const saveConfirmButton = document.getElementById('saveConfirmButton');
-        const saveFileName = document.getElementById('saveFileName');
-        const filesModal = document.getElementById('filesModal');
-        const filesModalClose = document.getElementById('filesModalClose');
-        const filesCancelButton = document.getElementById('filesCancelButton');
-        const filesList = document.getElementById('filesList');
-        const noFilesMessage = document.getElementById('noFilesMessage');
+        const loadModal = document.getElementById('loadModal');
+        const closeSaveModal = document.getElementById('closeSaveModal');
+        const closeLoadModal = document.getElementById('closeLoadModal');
+        const cancelSave = document.getElementById('cancelSave');
+        const cancelLoad = document.getElementById('cancelLoad');
+        const saveForm = document.getElementById('saveForm');
+        const noteTitle = document.getElementById('noteTitle');
+        const savedNotesList = document.getElementById('savedNotesList');
+
+        // Grammar toolbar toggle
+        grammarToggle.addEventListener('click', () => {
+            grammarToolbar.classList.toggle('open');
+        });
+
+        // Theme toggle functionality
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+                try {
+                    document.cookie = "theme=dark; path=/; max-age=31536000"; // 1 year
+                } catch (e) {
+                    console.error("Could not set theme cookie:", e);
+                }
+            } else {
+                toggleIcon.classList.remove('fa-sun');
+                toggleIcon.classList.add('fa-moon');
+                try {
+                    document.cookie = "theme=light; path=/; max-age=31536000";
+                } catch (e) {
+                    console.error("Could not set theme cookie:", e);
+                }
+            }
+        });
+
+        // Check for saved theme in cookies
+        function getCookie(name) {
+            try {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            } catch (e) {
+                console.error("Error reading cookie:", e);
+                return null;
+            }
+        }
+
+        try {
+            const savedTheme = getCookie('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+            }
+        } catch (e) {
+            console.error("Error reading theme cookie:", e);
+        }
+
+        // Set initial height to match textarea
+        highlightContainer.style.height = `${editor.offsetHeight}px`;
+
+        let typingTimer;
+        const typingInterval = 500; // Wait time after typing stops
+
+        editor.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            
+            // Update word count and character count immediately
+            updateCounts();
+            
+            // Show loading state
+            loading.style.display = 'flex';
+            
+            // Start analysis after typing stops
+            typingTimer = setTimeout(() => {
+                analyzeText();
+            }, typingInterval);
+        });
+
+        // Ensure highlight container scrolls with textarea
+        editor.addEventListener('scroll', () => {
+            highlightContainer.scrollTop = editor.scrollTop;
+            highlightContainer.scrollLeft = editor.scrollLeft;
+        });
+
+        // Handle mouse over highlighted text
+        highlightContainer.addEventListener('mouseover', (e) => {
+            if (e.target.classList.contains('gpt-highlight')) {
+                showPopup(e.target);
+            }
+        });
+
+        highlightContainer.addEventListener('mouseout', () => {
+            popup.classList.remove('visible');
+        });
+
+        function updateCounts() {
+            const text = editor.value;
+            // Word count
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCount.textContent = words;
+            // Character count
+            charCount.textContent = text.length;
+        }
+
+        function analyzeText() {
+            const text = editor.value;
+            
+            if (text.trim() === '') {
+                // Reset all stats and highlights
+                updateGptScore(0);
+                updateGrammarScore(100);
+                highlightContainer.innerHTML = '';
+                issueList.innerHTML = '<li class="issue-item"><i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i><span class="issue-text">No grammar issues found!</span></li>';
+                loading.style.display = 'none';
+                return;
+            }
+
+            // Simulate API call for GPT detection
+            setTimeout(() => {
+                const gptPercentage = simulateGptDetection(text);
+                const grammarIssues = checkGrammar(text);
+                
+                // Update GPT score
+                updateGptScore(gptPercentage);
+                
+                // Update grammar score
+                const grammarPercentage = 100 - (grammarIssues.length * 5);
+                updateGrammarScore(Math.max(0, grammarPercentage));
+                
+                // Apply highlights
+                applyHighlights(text, gptPercentage, grammarIssues);
+                
+                // Update issue list
+                updateIssueList(grammarIssues);
+                
+                // Open grammar toolbar if there are issues
+                if (grammarIssues.length > 0) {
+                    grammarToolbar.classList.add('open');
+                }
+                
+                // Hide loading state
+                loading.style.display = 'none';
+            }, 600);
+        }
+
+        function updateGptScore(score) {
+            gptScore.textContent = `${score}%`;
+            gptProgressBar.style.width = `${score}%`;
+            
+            // Set color based on score
+            g
