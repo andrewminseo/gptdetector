@@ -7,32 +7,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #7209b7;
+            --primary: #3a86ff;
+            --secondary: #00b4d8;
             --light-bg: #f8f9fa;
             --light-text: #212529;
             --dark-bg: #121212;
             --dark-text: #e9ecef;
-            --highlight: #4cc9f0;
+            --highlight: #0077b6;
             --error: #e63946;
             --warning: #ffb703;
             --success: #2a9d8f;
             --border-radius: 8px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
-            --notepad-bg: #ffffeb;
-            --notepad-dark-bg: #1e1e2d;
-            --notepad-line: #e6e6c5;
-            --notepad-line-dark: #2a2a3a;
+            --blue-light-bg: #ebf5ff;
+            --blue-light-text: #0a2540;
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--light-bg);
             color: var(--light-text);
             transition: var(--transition);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         body.dark-mode {
@@ -40,119 +42,215 @@
             color: var(--dark-text);
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem;
+        body.blue-light-mode {
+            background-color: var(--blue-light-bg);
+            color: var(--blue-light-text);
         }
 
-        header {
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 1rem;
+            padding: 0.75rem 1.5rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+        }
+
+        body.dark-mode .top-bar {
+            background-color: #1e1e1e;
+            border-bottom: 1px solid #333;
+        }
+
+        body.blue-light-mode .top-bar {
+            background-color: #d6e8ff;
+            border-bottom: 1px solid #b8d4ff;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 600;
             color: var(--primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .header-actions {
+        body.dark-mode .logo {
+            color: #4c9eff;
+        }
+
+        body.blue-light-mode .logo {
+            color: #0055cc;
+        }
+
+        .controls {
             display: flex;
+            align-items: center;
             gap: 1rem;
-            align-items: center;
         }
 
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .theme-menu {
+            position: relative;
+            display: inline-block;
         }
 
-        .btn:hover {
-            filter: brightness(1.1);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-
-        .btn-danger {
-            background-color: var(--error);
-        }
-
-        .theme-toggle {
+        .theme-button {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--light-text);
+            padding: 0.5rem;
+            border-radius: 4px;
             transition: var(--transition);
         }
 
-        body.dark-mode .theme-toggle {
+        .theme-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .theme-button {
             color: var(--dark-text);
         }
 
-        .main-content {
+        body.dark-mode .theme-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.blue-light-mode .theme-button {
+            color: var(--blue-light-text);
+        }
+
+        body.blue-light-mode .theme-button:hover {
+            background-color: rgba(0, 85, 204, 0.1);
+        }
+
+        .theme-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            z-index: 100;
+            min-width: 160px;
+            overflow: hidden;
+        }
+
+        body.dark-mode .theme-dropdown {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+        }
+
+        body.blue-light-mode .theme-dropdown {
+            background-color: #f0f7ff;
+            border: 1px solid #c4dbff;
+        }
+
+        .theme-dropdown.show {
+            display: block;
+        }
+
+        .theme-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: var(--transition);
             display: flex;
-            gap: 1.5rem;
-            height: calc(100vh - 150px);
-            min-height: 500px;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-option:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .theme-option:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.blue-light-mode .theme-option:hover {
+            background-color: rgba(0, 85, 204, 0.05);
+        }
+
+        .theme-option i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .save-button, .files-button {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            color: var(--light-text);
+        }
+
+        .save-button:hover, .files-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode .save-button, 
+        body.dark-mode .files-button {
+            border-color: #444;
+            color: var(--dark-text);
+        }
+
+        body.dark-mode .save-button:hover, 
+        body.dark-mode .files-button:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.blue-light-mode .save-button, 
+        body.blue-light-mode .files-button {
+            border-color: #b8d4ff;
+            color: var(--blue-light-text);
+        }
+
+        body.blue-light-mode .save-button:hover, 
+        body.blue-light-mode .files-button:hover {
+            background-color: rgba(0, 85, 204, 0.05);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
         .editor-section {
             flex: 1;
-            min-width: 0;
             display: flex;
             flex-direction: column;
-        }
-
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            background-color: #f1f1f1;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-        }
-
-        body.dark-mode .toolbar {
-            background-color: #2a2a2a;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .editor-container {
+            flex: 1;
             position: relative;
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-            background-color: var(--notepad-bg);
+            border-radius: var(--border-radius);
+            background-color: white;
             box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            flex-grow: 1;
             overflow: hidden;
-            background-image: linear-gradient(var(--notepad-line) 1px, transparent 1px);
-            background-size: 100% 24px;
-            background-position-y: 23px;
         }
 
         body.dark-mode .editor-container {
-            background-color: var(--notepad-dark-bg);
-            background-image: linear-gradient(var(--notepad-line-dark) 1px, transparent 1px);
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+        }
+
+        body.blue-light-mode .editor-container {
+            background-color: white;
+            border: 1px solid #d6e8ff;
         }
 
         .editor {
@@ -160,7 +258,7 @@
             height: 100%;
             padding: 1rem;
             font-size: 1rem;
-            line-height: 24px;
+            line-height: 1.5;
             border: none;
             outline: none;
             resize: none;
@@ -168,143 +266,14 @@
             color: var(--light-text);
             transition: var(--transition);
             box-sizing: border-box;
-            caret-color: var(--primary);
         }
 
         body.dark-mode .editor {
             color: var(--dark-text);
         }
 
-        .counter-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem;
-            background-color: #f1f1f1;
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-            font-size: 0.875rem;
-            color: #6c757d;
-        }
-
-        body.dark-mode .counter-bar {
-            background-color: #2a2a2a;
-        }
-
-        .grammar-section {
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-            transform: translateX(0);
-        }
-
-        .grammar-section.collapsed {
-            transform: translateX(calc(100% - 40px));
-        }
-
-        .grammar-toggle {
-            width: 40px;
-            align-self: flex-start;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius) 0 0 var(--border-radius);
-            padding: 1rem 0.5rem;
-            cursor: pointer;
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            text-align: center;
-            font-weight: 600;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 0;
-            z-index: 2;
-        }
-
-        .grammar-content {
-            flex-grow: 1;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        body.dark-mode .grammar-content {
-            background-color: #1e1e1e;
-        }
-
-        .grammar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        body.dark-mode .grammar-header {
-            border-bottom-color: #333;
-        }
-
-        .grammar-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .grammar-score {
-            background-color: var(--success);
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 700;
-        }
-
-        .issue-list {
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .issue-item {
-            list-style: none;
-            padding: 0.75rem 1rem;
-            margin: 0.5rem;
-            border-radius: var(--border-radius);
-            background-color: #f8f9fa;
-            box-shadow: var(--box-shadow);
-            display: flex;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        body.dark-mode .issue-item {
-            background-color: #2a2a2a;
-        }
-
-        .issue-icon {
-            margin-right: 0.75rem;
-            font-size: 1rem;
-            color: var(--warning);
-        }
-
-        .issue-text {
-            flex: 1;
-            font-size: 0.875rem;
-        }
-
-        .issue-suggestion {
-            font-weight: 500;
-            color: var(--primary);
-            cursor: pointer;
-            margin-left: 0.5rem;
-            font-size: 0.875rem;
+        body.blue-light-mode .editor {
+            color: var(--blue-light-text);
         }
 
         .highlight-container {
@@ -316,9 +285,9 @@
             pointer-events: none;
             padding: 1rem;
             white-space: pre-wrap;
-            overflow: auto;
+            overflow: hidden;
             font-size: 1rem;
-            line-height: 24px;
+            line-height: 1.5;
             color: transparent;
             box-sizing: border-box;
         }
@@ -331,6 +300,178 @@
         .grammar-highlight {
             background-color: rgba(255, 183, 3, 0.2);
             border-bottom: 2px solid var(--warning);
+        }
+
+        .grammar-section {
+            width: 320px;
+            background-color: white;
+            border-left: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .grammar-section {
+            background-color: #1e1e1e;
+            border-left: 1px solid #333;
+        }
+
+        body.blue-light-mode .grammar-section {
+            background-color: #f0f7ff;
+            border-left: 1px solid #d6e8ff;
+        }
+
+        .grammar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode .grammar-header {
+            border-bottom: 1px solid #333;
+        }
+
+        body.blue-light-mode .grammar-header {
+            border-bottom: 1px solid #d6e8ff;
+        }
+
+        .grammar-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .grammar-score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-circle {
+            width: 30px;
+            height: 30px;
+            position: relative;
+        }
+
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .grammar-issues {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .issue-card {
+            margin-bottom: 0.75rem;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        body.dark-mode .issue-card {
+            background-color: #2a2a2a;
+        }
+
+        body.blue-light-mode .issue-card {
+            background-color: white;
+            border: 1px solid #e8f2ff;
+        }
+
+        .issue-header {
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .issue-header {
+            border-bottom: 1px solid #333;
+        }
+
+        body.blue-light-mode .issue-header {
+            border-bottom: 1px solid #e8f2ff;
+        }
+
+        .issue-icon {
+            color: var(--warning);
+            font-size: 1rem;
+        }
+
+        .issue-title {
+            font-weight: 500;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+
+        .issue-content {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .issue-suggestion {
+            margin-top: 0.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        body.dark-mode .issue-suggestion {
+            color: #4c9eff;
+        }
+
+        body.blue-light-mode .issue-suggestion {
+            color: #0055cc;
+        }
+
+        .gpt-detection {
+            padding: 0.75rem 1rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        body.dark-mode .gpt-detection {
+            background-color: #252525;
+            border-top: 1px solid #333;
+        }
+
+        body.blue-light-mode .gpt-detection {
+            background-color: #e8f2ff;
+            border-top: 1px solid #d6e8ff;
+        }
+
+        .gpt-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .gpt-score {
+            font-weight: 600;
+        }
+
+        .gpt-high {
+            color: var(--error);
+        }
+
+        .gpt-medium {
+            color: var(--warning);
+        }
+
+        .gpt-low {
+            color: var(--success);
         }
 
         .popup {
@@ -347,6 +488,12 @@
 
         body.dark-mode .popup {
             background-color: #2a2a2a;
+            border: 1px solid #444;
+        }
+
+        body.blue-light-mode .popup {
+            background-color: white;
+            border: 1px solid #d6e8ff;
         }
 
         .popup-title {
@@ -381,6 +528,10 @@
             background-color: rgba(30, 30, 30, 0.8);
         }
 
+        body.blue-light-mode .loading {
+            background-color: rgba(240, 247, 255, 0.8);
+        }
+
         .spinner {
             width: 40px;
             height: 40px;
@@ -395,140 +546,96 @@
             border-top-color: var(--primary);
         }
 
+        body.blue-light-mode .spinner {
+            border-color: rgba(0, 85, 204, 0.1);
+            border-top-color: var(--primary);
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .gpt-detection-section {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 1rem;
-            transition: var(--transition);
-            margin-top: 1rem;
-        }
-
-        body.dark-mode .gpt-detection-section {
-            background-color: #1e1e1e;
-        }
-
-        .gpt-detection-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .gpt-detection-title {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .gpt-score-container {
-            display: flex;
-            align-items: center;
-        }
-
-        .gpt-progress {
-            width: 100%;
-            height: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        body.dark-mode .gpt-progress {
-            background-color: #333;
-        }
-
-        .gpt-progress-bar {
-            height: 100%;
-            background-color: var(--error);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .gpt-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #6c757d;
-        }
-
-        .gpt-high {
-            color: var(--error);
-        }
-
-        .gpt-medium {
-            color: var(--warning);
-        }
-
-        .gpt-low {
-            color: var(--success);
-        }
-
-        /* Save/Load Panel Styles */
-        .save-panel {
+        /* Save dialog */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            z-index: 100;
-            visibility: hidden;
-            opacity: 0;
-            transition: var(--transition);
         }
 
-        .save-panel.visible {
-            visibility: visible;
-            opacity: 1;
+        .modal.show {
+            display: flex;
         }
 
-        .save-dialog {
+        .modal-content {
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             width: 400px;
             max-width: 90%;
-            padding: 1.5rem;
-            max-height: 80vh;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
-        body.dark-mode .save-dialog {
-            background-color: #1e1e1e;
+        body.dark-mode .modal-content {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
         }
 
-        .save-dialog-header {
+        body.blue-light-mode .modal-content {
+            background-color: white;
+            border: 1px solid #d6e8ff;
+        }
+
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
         }
 
-        body.dark-mode .save-dialog-header {
-            border-bottom-color: #333;
+        body.dark-mode .modal-header {
+            border-bottom: 1px solid #444;
         }
 
-        .save-dialog-title {
-            font-size: 1.25rem;
+        body.blue-light-mode .modal-header {
+            border-bottom: 1px solid #e8f2ff;
+        }
+
+        .modal-title {
             font-weight: 600;
+            font-size: 1.1rem;
         }
 
-        .close-dialog {
+        .modal-close {
             background: none;
             border: none;
-            font-size: 1.25rem;
             cursor: pointer;
-            color: #6c757d;
+            font-size: 1.2rem;
+            color: #888;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: #555;
+        }
+
+        body.dark-mode .modal-close {
+            color: #aaa;
+        }
+
+        body.dark-mode .modal-close:hover {
+            color: #ddd;
+        }
+
+        .modal-body {
+            padding: 1rem;
         }
 
         .input-group {
@@ -538,26 +645,121 @@
         .input-label {
             display: block;
             margin-bottom: 0.5rem;
+            font-size: 0.875rem;
             font-weight: 500;
         }
 
-        .input-field {
+        .text-input {
             width: 100%;
             padding: 0.5rem;
             border: 1px solid #ddd;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
             font-size: 1rem;
             box-sizing: border-box;
         }
 
-        body.dark-mode .input-field {
-            background-color: #2a2a2a;
+        body.dark-mode .text-input {
+            background-color: #333;
             border-color: #444;
-            color: var(--dark-text);
+            color: #ddd;
         }
 
-        .saved-files {
-            margin-top: 1rem;
+        body.blue-light-mode .text-input {
+            border-color: #d6e8ff;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        body.dark-mode .modal-footer {
+            border-top: 1px solid #444;
+        }
+
+        body.blue-light-mode .modal-footer {
+            border-top: 1px solid #e8f2ff;
+        }
+
+        .modal-button {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cancel-button {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .cancel-button:hover {
+            background-color: #e9ecef;
+        }
+
+        body.dark-mode .cancel-button {
+            background-color: #333;
+            border-color: #444;
+            color: #ddd;
+        }
+
+        body.dark-mode .cancel-button:hover {
+            background-color: #444;
+        }
+
+        body.blue-light-mode .cancel-button {
+            background-color: #f0f7ff;
+            border-color: #d6e8ff;
+            color: #0055cc;
+        }
+
+        body.blue-light-mode .cancel-button:hover {
+            background-color: #e8f2ff;
+        }
+
+        .save-confirm-button {
+            background-color: var(--primary);
+            border: 1px solid var(--primary);
+            color: white;
+        }
+
+        .save-confirm-button:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+        body.dark-mode .save-confirm-button {
+            background-color: #4c9eff;
+            border-color: #4c9eff;
+        }
+
+        body.dark-mode .save-confirm-button:hover {
+            background-color: #2388ff;
+            border-color: #2388ff;
+        }
+
+        body.blue-light-mode .save-confirm-button {
+            background-color: #0055cc;
+            border-color: #0055cc;
+        }
+
+        body.blue-light-mode .save-confirm-button:hover {
+            background-color: #004099;
+            border-color: #004099;
+        }
+
+        /* Files modal */
+        .files-list {
             max-height: 300px;
             overflow-y: auto;
         }
@@ -567,32 +769,37 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background-color: #f8f9fa;
-            border-radius: var(--border-radius);
-            cursor: pointer;
+            border-bottom: 1px solid #eee;
             transition: var(--transition);
         }
 
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
         .file-item:hover {
-            background-color: #e9ecef;
+            background-color: #f8f9fa;
         }
 
         body.dark-mode .file-item {
-            background-color: #2a2a2a;
+            border-bottom: 1px solid #333;
         }
 
         body.dark-mode .file-item:hover {
             background-color: #333;
         }
 
-        .file-title {
-            font-weight: 500;
+        body.blue-light-mode .file-item {
+            border-bottom: 1px solid #e8f2ff;
         }
 
-        .file-date {
-            font-size: 0.75rem;
-            color: #6c757d;
+        body.blue-light-mode .file-item:hover {
+            background-color: #f0f7ff;
+        }
+
+        .file-name {
+            font-weight: 500;
+            cursor: pointer;
         }
 
         .file-actions {
@@ -600,375 +807,203 @@
             gap: 0.5rem;
         }
 
-        .file-btn {
+        .file-action {
             background: none;
             border: none;
-            font-size: 1rem;
             cursor: pointer;
             color: #6c757d;
+            font-size: 0.875rem;
+            padding: 0.25rem;
+            border-radius: 4px;
             transition: var(--transition);
         }
 
-        .file-btn:hover {
-            color: var(--primary);
+        .file-action:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #343a40;
         }
 
-        .delete-btn:hover {
-            color: var(--error);
+        body.dark-mode .file-action {
+            color: #aaa;
         }
 
-        @media (max-width: 900px) {
-            .main-content {
+        body.dark-mode .file-action:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ddd;
+        }
+
+        body.blue-light-mode .file-action:hover {
+            background-color: rgba(0, 85, 204, 0.05);
+            color: #0055cc;
+        }
+
+        .no-files {
+            padding: 1.5rem;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        body.dark-mode .no-files {
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
                 flex-direction: column;
-                height: auto;
             }
             
             .grammar-section {
                 width: 100%;
-                margin-top: 1rem;
+                border-left: none;
+                border-top: 1px solid #eee;
             }
-
-            .grammar-section.collapsed {
-                transform: translateY(calc(100% - 40px));
+            
+            body.dark-mode .grammar-section {
+                border-top: 1px solid #333;
             }
-
-            .grammar-toggle {
-                writing-mode: horizontal-tb;
-                transform: none;
-                width: 100%;
-                height: 40px;
-                border-radius: var(--border-radius) var(--border-radius) 0 0;
-                top: 0;
-                left: 0;
-                transform: none;
-            }
-
-            .editor-container {
-                height: 350px;
+            
+            body.blue-light-mode .grammar-section {
+                border-top: 1px solid #d6e8ff;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-file-alt"></i>
-                <span>Notepad</span>
-            </div>
-            <div class="header-actions">
-                <button id="saveBtn" class="btn">
-                    <i class="fas fa-save"></i>
-                    Save
-                </button>
-                <button id="loadBtn" class="btn btn-secondary">
-                    <i class="fas fa-folder-open"></i>
-                    Load
-                </button>
-                <button class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
-        </header>
-
-        <div class="main-content">
-            <div class="editor-section">
-                <div class="toolbar">
-                    <div>File</div>
-                    <div>Edit</div>
-                </div>
-                <div class="editor-container">
-                    <textarea id="editor" class="editor" placeholder="Type or paste your text here..."></textarea>
-                    <div class="highlight-container" id="highlightContainer"></div>
-                    <div class="loading" id="loading" style="display: none;">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-                <div class="counter-bar">
-                    <div id="wordCount">Words: 0</div>
-                    <div id="charCount">Characters: 0</div>
-                </div>
-            </div>
-
-            <div class="grammar-section" id="grammarSection">
-                <button class="grammar-toggle" id="grammarToggle">Grammar</button>
-                <div class="grammar-content">
-                    <div class="grammar-header">
-                        <div class="grammar-title">Grammar</div>
-                        <div class="grammar-score" id="grammarScore">100</div>
-                    </div>
-                    <ul class="issue-list" id="issueList">
-                        <!-- Grammar issues will be listed here -->
-                    </ul>
-                </div>
-            </div>
+    <div class="top-bar">
+        <div class="logo">
+            <i class="fas fa-edit"></i>
+            <span>Notepad</span>
         </div>
-
-        <div class="gpt-detection-section">
-            <div class="gpt-detection-header">
-                <div class="gpt-detection-title">AI Content Detection</div>
-                <div class="gpt-score-container">
-                    <div id="gptScore" class="gpt-low">0%</div>
-                </div>
-            </div>
-            <div class="gpt-progress">
-                <div class="gpt-progress-bar" id="gptProgressBar" style="width: 0%;"></div>
-            </div>
-            <div class="gpt-info">
-                <span>Human-written</span>
-                <span>AI-generated</span>
-            </div>
-        </div>
-
-        <div class="popup" id="popup">
-            <div class="popup-title">AI Content Detected</div>
-            <div class="popup-content">
-                This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
-            </div>
-        </div>
-
-        <!-- Save/Load Panel -->
-        <div class="save-panel" id="savePanel">
-            <div class="save-dialog">
-                <div class="save-dialog-header">
-                    <div class="save-dialog-title" id="dialogTitle">Save Note</div>
-                    <button class="close-dialog" id="closeDialog">×</button>
-                </div>
-                <div id="saveForm">
-                    <div class="input-group">
-                        <label for="noteName" class="input-label">Note Name</label>
-                        <input type="text" id="noteName" class="input-field" placeholder="Enter a name for your note">
+        <div class="controls">
+            <button class="save-button" id="saveButton">
+                <i class="fas fa-save"></i>
+                <span>Save</span>
+            </button>
+            <button class="files-button" id="filesButton">
+                <i class="fas fa-folder-open"></i>
+                <span>Files</span>
+            </button>
+            <div class="theme-menu">
+                <button class="theme-button" id="themeButton">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <div class="theme-dropdown" id="themeDropdown">
+                    <div class="theme-option" data-theme="light">
+                        <i class="fas fa-sun"></i>
+                        <span>Light Mode</span>
                     </div>
-                    <button id="saveNoteBtn" class="btn">Save Note</button>
-                </div>
-                <div id="loadForm" style="display: none;">
-                    <div class="saved-files" id="savedFiles">
-                        <!-- Saved files will be listed here -->
+                    <div class="theme-option" data-theme="dark">
+                        <i class="fas fa-moon"></i>
+                        <span>Dark Mode</span>
+                    </div>
+                    <div class="theme-option" data-theme="blue-light">
+                        <i class="fas fa-tint"></i>
+                        <span>Blue Light Mode</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="main-container">
+        <div class="editor-section">
+            <div class="editor-container">
+                <textarea id="editor" class="editor" placeholder="Type or paste your text here..."></textarea>
+                <div class="highlight-container" id="highlightContainer"></div>
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grammar-section">
+            <div class="grammar-header">
+                <div class="grammar-title">Grammar</div>
+                <div class="grammar-score">
+                    <div class="score-circle">
+                        <svg width="30" height="30" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="#eee" stroke-width="2"></circle>
+                            <circle id="grammarScoreCircle" cx="18" cy="18" r="16" fill="none" stroke="#2a9d8f" stroke-width="2" stroke-dasharray="100 100" stroke-dashoffset="0"></circle>
+                        </svg>
+                        <div class="score-value" id="grammarScoreText">100</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grammar-issues" id="grammarIssues">
+                <!-- Grammar issues will be displayed here -->
+                <div class="no-files" id="noIssuesMessage">
+                    No grammar issues found!
+                </div>
+            </div>
+            <div class="gpt-detection">
+                <div class="gpt-title">GPT Detection</div>
+                <div class="gpt-score" id="gptScore">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-title">AI Content Detected</div>
+        <div class="popup-content">
+            This section shows characteristics typical of AI-generated text, such as overly formal language, predictable sentence structure, and lack of personal voice.
+        </div>
+    </div>
+
+    <!-- Save Modal -->
+    <div class="modal" id="saveModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Save Note</div>
+                <button class="modal-close" id="saveModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label class="input-label" for="saveFileName">File Name</label>
+                    <input type="text" id="saveFileName" class="text-input" placeholder="Enter a name for your note">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button cancel-button" id="saveCancelButton">Cancel</button>
+                <button class="modal-button save-confirm-button" id="saveConfirmButton">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Files Modal -->
+    <div class="modal" id="filesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Saved Notes</div>
+                <button class="modal-close" id="filesModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="files-list" id="filesList">
+                    <!-- Saved files will be listed here -->
+                    <div class="no-files" id="noFilesMessage">
+                        No saved notes found!
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button cancel-button" id="filesCancelButton">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const toggleIcon = themeToggle.querySelector('i');
-
-        // Theme toggle without localStorage
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            
-            if (body.classList.contains('dark-mode')) {
-                toggleIcon.classList.remove('fa-moon');
-                toggleIcon.classList.add('fa-sun');
-            } else {
-                toggleIcon.classList.remove('fa-sun');
-                toggleIcon.classList.add('fa-moon');
-            }
-        });
-
-        // Grammar panel toggle
-        const grammarToggle = document.getElementById('grammarToggle');
-        const grammarSection = document.getElementById('grammarSection');
-
-        grammarToggle.addEventListener('click', () => {
-            grammarSection.classList.toggle('collapsed');
-        });
-
-        // Text editor functionality
+        // DOM Elements
+        const themeButton = document.getElementById('themeButton');
+        const themeDropdown = document.getElementById('themeDropdown');
+        const themeOptions = document.querySelectorAll('.theme-option');
         const editor = document.getElementById('editor');
         const highlightContainer = document.getElementById('highlightContainer');
         const gptScore = document.getElementById('gptScore');
-        const gptProgressBar = document.getElementById('gptProgressBar');
-        const grammarScore = document.getElementById('grammarScore');
-        const wordCount = document.getElementById('wordCount');
-        const charCount = document.getElementById('charCount');
-        const issueList = document.getElementById('issueList');
+        const grammarScoreText = document.getElementById('grammarScoreText');
+        const grammarScoreCircle = document.getElementById('grammarScoreCircle');
+        const grammarIssues = document.getElementById('grammarIssues');
+        const noIssuesMessage = document.getElementById('noIssuesMessage');
         const popup = document.getElementById('popup');
         const loading = document.getElementById('loading');
-
-        let typingTimer;
-        const typingInterval = 500; // Wait time after typing stops
-
-        editor.addEventListener('input', () => {
-            clearTimeout(typingTimer);
-            
-            // Update word and character counts immediately
-            updateCounts();
-            
-            // Show loading state
-            loading.style.display = 'flex';
-            
-            // Start analysis after typing stops
-            typingTimer = setTimeout(() => {
-                analyzeText();
-            }, typingInterval);
-        });
-
-        // Sync scrolling between editor and highlight container
-        editor.addEventListener('scroll', () => {
-            highlightContainer.scrollTop = editor.scrollTop;
-            highlightContainer.scrollLeft = editor.scrollLeft;
-        });
-
-        // Handle mouse over highlighted text
-        highlightContainer.addEventListener('mouseover', (e) => {
-            if (e.target.classList.contains('gpt-highlight')) {
-                showPopup(e.target);
-            }
-        });
-
-        highlightContainer.addEventListener('mouseout', () => {
-            popup.classList.remove('visible');
-        });
-
-        function updateCounts() {
-            const text = editor.value;
-            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            const chars = text.length;
-            
-            wordCount.textContent = `Words: ${words}`;
-            charCount.textContent = `Characters: ${chars}`;
-        }
-
-        function analyzeText() {
-            const text = editor.value;
-            
-            if (text.trim() === '') {
-                // Reset all stats and highlights
-                updateGptScore(0);
-                updateGrammarScore(100);
-                highlightContainer.innerHTML = '';
-                issueList.innerHTML = '<li class="issue-item"><i class="fas fa-check-circle issue-icon" style="color: var(--success)"></i><span class="issue-text">No grammar issues found!</span></li>';
-                loading.style.display = 'none';
-                return;
-            }
-
-            // Simulate API call for GPT detection
-            setTimeout(() => {
-                const gptPercentage = simulateGptDetection(text);
-                const grammarIssues = checkGrammar(text);
-                
-                // Update GPT score
-                updateGptScore(gptPercentage);
-                
-                // Update grammar score
-                const grammarPercentage = 100 - (grammarIssues.length * 5);
-                updateGrammarScore(Math.max(0, grammarPercentage));
-                
-                // Apply highlights
-                applyHighlights(text, gptPercentage, grammarIssues);
-                
-                // Update issue list
-                updateIssueList(grammarIssues);
-                
-                // Hide loading state
-                loading.style.display = 'none';
-            }, 600);
-        }
-
-        function updateGptScore(score) {
-            gptScore.textContent = `${score}%`;
-            gptProgressBar.style.width = `${score}%`;
-            
-            // Set color based on score
-            gptScore.className = '';
-            if (score >= 70) {
-                gptScore.classList.add('gpt-high');
-            } else if (score >= 40) {
-                gptScore.classList.add('gpt-medium');
-            } else {
-                gptScore.classList.add('gpt-low');
-            }
-        }
-
-        function updateGrammarScore(score) {
-            grammarScore.textContent = score;
-            
-            // Set color based on score
-            if (score >= 90) {
-                grammarScore.style.backgroundColor = 'var(--success)';
-            } else if (score >= 70) {
-                grammarScore.style.backgroundColor = 'var(--warning)';
-            } else {
-                grammarScore.style.backgroundColor = 'var(--error)';
-            }
-        }
-
-        function simulateGptDetection(text) {
-            // This is a simplified simulation of GPT detection
-            // In a real implementation, this would be an API call
-            
-            // List of patterns that are more common in AI-generated text
-            const aiPatterns = [
-                /furthermore/i,
-                /moreover/i,
-                /additionally/i,
-                /however,/i,
-                /nevertheless/i,
-                /consequently/i,
-                /in conclusion/i,
-                /to summarize/i,
-                /as a result/i,
-                /in essence/i,
-                /it is worth noting that/i,
-                /it is important to consider/i,
-                /it goes without saying/i,
-                /it should be emphasized that/i
-            ];
-            
-            // Check for patterns
-            let matchCount = 0;
-            aiPatterns.forEach(pattern => {
-                if (pattern.test(text)) {
-                    matchCount++;
-                }
-            });
-            
-            // Check for sentence variety
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-            const sentenceLengths = sentences.map(s => s.trim().split(/\s+/).length);
-            const sentenceVariety = calculateStandardDeviation(sentenceLengths);
-            
-            // Low standard deviation suggests uniform sentence length (more likely AI)
-            const varietyFactor = Math.min(sentenceVariety * 5, 20);
-            
-            // Calculate GPT score based on patterns and variety
-            const patternScore = (matchCount / aiPatterns.length) * 70;
-            const varietyScore = (1 - (varietyFactor / 20)) * 30;
-            const calculatedScore = Math.min(Math.round(patternScore + varietyScore), 99);
-            
-            // Add randomness for demo purposes
-            return Math.min(Math.max(calculatedScore + (Math.random() * 10 - 5), 1), 99);
-        }
-
-        function calculateStandardDeviation(values) {
-            if (values.length <= 1) return 0;
-            
-            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-            const squareDiffs = values.map(val => Math.pow(val - mean, 2));
-            const variance = squareDiffs.reduce((sum, val) => sum + val, 0) / values.length;
-            
-            return Math.sqrt(variance);
-        }
-
-        function checkGrammar(text) {
-            // Simplified grammar checking
-            // In a real implementation, this would use a grammar checking API
-            
-            const issues = [];
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-            
-            // Common issues to check for
-            const grammarPatterns = [
-                { pattern: /\b(their|they're|there)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(your|you're)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(its|it's)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(affect|effect)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(then|than)\b/gi, type: 'commonly confused words' },
-                { pattern: /\b(to|too|two)\b/gi, type: 'commonly confused words' },
-                { pattern: /\s[,.!?]|\s+$/g, type: 'punctuation spacing' },
-                { pattern: /\b(\w+)\s+\1\b/gi, type: 'repeated word' },
-                { pattern: /\b(alot|definately|seperate|recieve|accomodate)\b/gi, type: 'spelling' }
+        
+        // Save/Files Modal Elements
+        const sa
